@@ -146,7 +146,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
         )}
         <Table>
           <TableHeader className="sticky top-0 bg-background z-20">
-            <TableRow className="sticky">
+            <TableRow>
               {defaultColumns.map((column) => (
                 <TableHead 
                   key={column.key}
