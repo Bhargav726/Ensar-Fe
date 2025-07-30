@@ -1,10 +1,9 @@
 
 import { useState, useRef, useEffect } from "react"
-import { ChevronDown, X, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { ChevronDown, X, Search } from "lucide-react"
 
 interface Option {
   value: string
@@ -17,7 +16,6 @@ interface MultiSelectDropdownProps {
   selectedValues: string[]
   onSelectionChange: (values: string[]) => void
   placeholder?: string
-  className?: string
 }
 
 export function MultiSelectDropdown({
@@ -25,159 +23,152 @@ export function MultiSelectDropdown({
   options,
   selectedValues,
   onSelectionChange,
-  placeholder = "Search...",
-  className
+  placeholder = "Search..."
 }: MultiSelectDropdownProps) {
-  const [open, setOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
-  const inputRef = useRef<HTMLInputElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   const filteredOptions = options.filter(option =>
     option.label.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const selectedOptions = options.filter(option => 
-    selectedValues.includes(option.value)
-  )
-
-  const toggleOption = (value: string) => {
-    const newSelection = selectedValues.includes(value)
-      ? selectedValues.filter(v => v !== value)
-      : [...selectedValues, value]
-    onSelectionChange(newSelection)
+  const handleToggleOption = (value: string) => {
+    if (selectedValues.includes(value)) {
+      onSelectionChange(selectedValues.filter(v => v !== value))
+    } else {
+      onSelectionChange([...selectedValues, value])
+    }
   }
 
-  const removeOption = (value: string, e: React.MouseEvent) => {
-    e.stopPropagation()
+  const handleRemoveOption = (value: string, e?: React.MouseEvent) => {
+    e?.stopPropagation()
     onSelectionChange(selectedValues.filter(v => v !== value))
   }
 
-  const clearAll = () => {
+  const handleClearAll = () => {
     onSelectionChange([])
     setSearchTerm("")
   }
 
   useEffect(() => {
-    if (open && inputRef.current) {
-      inputRef.current.focus()
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+        setSearchTerm("")
+      }
     }
-  }, [open])
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  const getSelectedLabels = () => {
+    return selectedValues.map(value => 
+      options.find(option => option.value === value)?.label || value
+    )
+  }
 
   return (
-    <div className={cn("relative", className)}>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className={cn(
-              "h-auto min-h-[40px] justify-start text-left font-normal px-3 py-2",
-              selectedValues.length === 0 && "text-muted-foreground"
-            )}
-          >
-            <div className="flex items-center gap-2 flex-1">
-              <div className="flex items-center gap-1">
-                {selectedValues.length > 0 && (
-                  <>
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm font-medium">{label}</span>
-                    <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
-                      {selectedValues.length}
-                    </span>
-                  </>
-                )}
-              </div>
-              <ChevronDown className="h-4 w-4 opacity-50 ml-auto" />
-            </div>
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent 
-          className="w-80 p-0" 
-          align="start"
-          side="bottom"
-        >
-          <div className="p-3 border-b">
+    <div className="relative" ref={dropdownRef}>
+      <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+        {label}
+        {selectedValues.length > 0 && (
+          <>
+            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
+              {selectedValues.length}
+            </span>
+            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+          </>
+        )}
+      </label>
+      
+      <Button
+        variant="outline"
+        className="w-full justify-between h-auto min-h-[40px] p-2"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <div className="flex flex-wrap gap-1 flex-1 text-left">
+          {selectedValues.length === 0 ? (
+            <span className="text-muted-foreground">{placeholder}</span>
+          ) : (
+            getSelectedLabels().map((label, index) => (
+              <span
+                key={selectedValues[index]}
+                className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-md flex items-center gap-1"
+              >
+                {label}
+                <button
+                  onClick={(e) => handleRemoveOption(selectedValues[index], e)}
+                  className="hover:bg-blue-200 rounded-full p-0.5"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))
+          )}
+        </div>
+        <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+      </Button>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg z-50">
+          <div className="p-2 border-b">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="w-4 h-4 absolute left-2 top-2.5 text-muted-foreground" />
               <Input
-                ref={inputRef}
-                placeholder={placeholder}
+                placeholder={`Search ${label.toLowerCase()}...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-8 h-9"
               />
             </div>
-            
-            {selectedOptions.length > 0 && (
-              <div className="mt-3">
-                <div className="flex flex-wrap gap-1">
-                  {selectedOptions.map(option => (
-                    <div
-                      key={option.value}
-                      className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-sm px-2 py-1 rounded-md"
-                    >
-                      <span>{option.label}</span>
-                      <button
-                        type="button"
-                        onClick={(e) => removeOption(option.value, e)}
-                        className="hover:bg-blue-200 rounded-full p-0.5"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <Button
-                  type="button"
-                  variant="link"
-                  size="sm"
-                  onClick={clearAll}
-                  className="mt-2 p-0 h-auto text-xs text-muted-foreground hover:text-foreground"
-                >
-                  Clear all
-                </Button>
-              </div>
+            {selectedValues.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full mt-2 text-muted-foreground hover:text-foreground"
+                onClick={handleClearAll}
+              >
+                Clear all
+              </Button>
             )}
           </div>
           
-          <div className="max-h-60 overflow-auto">
-            {filteredOptions.length === 0 ? (
-              <div className="p-3 text-sm text-muted-foreground text-center">
-                No options found
-              </div>
-            ) : (
-              <div className="p-1">
-                {filteredOptions.map(option => {
-                  const isSelected = selectedValues.includes(option.value)
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => toggleOption(option.value)}
-                      className={cn(
-                        "w-full text-left px-3 py-2 text-sm rounded-md transition-colors",
-                        "hover:bg-accent hover:text-accent-foreground",
-                        isSelected && "bg-accent text-accent-foreground"
-                      )}
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className={cn(
-                          "w-4 h-4 border rounded flex items-center justify-center",
-                          isSelected && "bg-primary border-primary"
-                        )}>
-                          {isSelected && (
-                            <div className="w-2 h-2 bg-primary-foreground rounded-sm" />
-                          )}
-                        </div>
-                        <span>{option.label}</span>
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        </PopoverContent>
-      </Popover>
+          <ScrollArea className="max-h-48">
+            <div className="p-1">
+              {filteredOptions.map((option) => (
+                <div
+                  key={option.value}
+                  className={`flex items-center gap-2 p-2 cursor-pointer hover:bg-muted rounded-sm ${
+                    selectedValues.includes(option.value) ? 'bg-blue-50' : ''
+                  }`}
+                  onClick={() => handleToggleOption(option.value)}
+                >
+                  <div className={`w-4 h-4 border rounded flex items-center justify-center ${
+                    selectedValues.includes(option.value) 
+                      ? 'bg-blue-500 border-blue-500' 
+                      : 'border-muted-foreground'
+                  }`}>
+                    {selectedValues.includes(option.value) && (
+                      <svg className="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className="text-sm">{option.label}</span>
+                </div>
+              ))}
+              
+              {filteredOptions.length === 0 && (
+                <div className="p-2 text-sm text-muted-foreground text-center">
+                  No options found
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </div>
+      )}
     </div>
   )
 }

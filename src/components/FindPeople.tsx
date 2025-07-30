@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { PersonDetail } from "./PersonDetail"
 import { MultiSelectDropdown } from "./MultiSelectDropdown"
 import mockData from "../data/mockBusinesses.json"
@@ -38,7 +39,7 @@ export function FindPeople() {
   const [selectedStates, setSelectedStates] = useState<string[]>([])
   const [selectedCountries, setSelectedCountries] = useState<string[]>([])
 
-  const itemsPerPage = 25
+  const itemsPerPage = 10
 
   // Extract unique options from mock data
   const typeOptions = Array.from(new Set(mockData.businesses.map(b => b.type)))
@@ -249,7 +250,7 @@ export function FindPeople() {
                       options={countryOptions}
                       selectedValues={selectedCountries}
                       onSelectionChange={setSelectedCountries}
-                      placeholder="Search countries..."
+                      placeholder="Select countries..."
                     />
                   </div>
 
@@ -259,7 +260,7 @@ export function FindPeople() {
                       options={stateOptions}
                       selectedValues={selectedStates}
                       onSelectionChange={setSelectedStates}
-                      placeholder="Search states..."
+                      placeholder="Select states..."
                     />
                   </div>
 
@@ -269,7 +270,7 @@ export function FindPeople() {
                       options={cityOptions}
                       selectedValues={selectedCities}
                       onSelectionChange={setSelectedCities}
-                      placeholder="Search cities..."
+                      placeholder="Select cities..."
                     />
                   </div>
 
@@ -279,7 +280,7 @@ export function FindPeople() {
                       options={typeOptions}
                       selectedValues={selectedTypes}
                       onSelectionChange={setSelectedTypes}
-                      placeholder="Search business types..."
+                      placeholder="Select business types..."
                     />
                   </div>
                 </div>
@@ -318,94 +319,98 @@ export function FindPeople() {
               </div>
             </div>
 
-            {/* Table */}
-            <div className="flex-1 overflow-auto">
+            {/* Table Container with Scrollbars */}
+            <div className="flex-1 overflow-hidden">
               {loading ? (
                 <div className="flex items-center justify-center h-64">
                   <div className="text-muted-foreground">Loading...</div>
                 </div>
               ) : (
-                <Table>
-                  <TableHeader className="sticky top-0 bg-background">
-                    <TableRow>
-                      <TableHead>
-                        <div className="flex items-center gap-1">
-                          BUSINESS
-                          <ArrowUpDown className="w-4 h-4" />
-                        </div>
-                      </TableHead>
-                      <TableHead>
-                        <div className="flex items-center gap-1">
-                          ADDRESS
-                        </div>
-                      </TableHead>
-                      <TableHead>
-                        <div className="flex items-center gap-1">
-                          TYPE
-                        </div>
-                      </TableHead>
-                      <TableHead>
-                        <div className="flex items-center gap-1">
-                          RATING
-                        </div>
-                      </TableHead>
-                      <TableHead>
-                        <div className="flex items-center gap-1">
-                          CONTACT
-                        </div>
-                      </TableHead>
-                      <TableHead>
-                        <div className="flex items-center gap-1">
-                          STATUS
-                        </div>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {businesses.map((business) => (
-                      <TableRow 
-                        key={business.id}
-                        className="cursor-pointer hover:bg-muted/50"
-                        onClick={() => setSelectedBusiness(business)}
-                      >
-                        <TableCell>
-                          <div className="font-medium text-blue-600 hover:underline">
-                            {business.name}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {business.address}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {business.type}
-                        </TableCell>
-                        <TableCell>
-                          {business.rating && business.reviewCount ? formatRating(business.rating, business.reviewCount) : '-'}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {business.phone && (
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <Phone className="w-4 h-4" />
-                              </Button>
-                            )}
-                            {business.website && (
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <Globe className="w-4 h-4" />
-                              </Button>
-                            )}
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <MapPin className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {getStatusBadge(business.status)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <ScrollArea className="h-full w-full">
+                  <div className="min-w-[800px]">
+                    <Table>
+                      <TableHeader className="sticky top-0 bg-background z-10">
+                        <TableRow>
+                          <TableHead className="sticky left-0 bg-background z-20 min-w-[200px]">
+                            <div className="flex items-center gap-1">
+                              BUSINESS
+                              <ArrowUpDown className="w-4 h-4" />
+                            </div>
+                          </TableHead>
+                          <TableHead className="min-w-[300px]">
+                            <div className="flex items-center gap-1">
+                              ADDRESS
+                            </div>
+                          </TableHead>
+                          <TableHead className="min-w-[150px]">
+                            <div className="flex items-center gap-1">
+                              TYPE
+                            </div>
+                          </TableHead>
+                          <TableHead className="min-w-[120px]">
+                            <div className="flex items-center gap-1">
+                              RATING
+                            </div>
+                          </TableHead>
+                          <TableHead className="min-w-[120px]">
+                            <div className="flex items-center gap-1">
+                              CONTACT
+                            </div>
+                          </TableHead>
+                          <TableHead className="min-w-[100px]">
+                            <div className="flex items-center gap-1">
+                              STATUS
+                            </div>
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {businesses.map((business) => (
+                          <TableRow 
+                            key={business.id}
+                            className="cursor-pointer hover:bg-muted/50"
+                            onClick={() => setSelectedBusiness(business)}
+                          >
+                            <TableCell className="sticky left-0 bg-background border-r">
+                              <div className="font-medium text-blue-600 hover:underline">
+                                {business.name}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {business.address}
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {business.type}
+                            </TableCell>
+                            <TableCell>
+                              {business.rating && business.reviewCount ? formatRating(business.rating, business.reviewCount) : '-'}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {business.phone && (
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <Phone className="w-4 h-4" />
+                                  </Button>
+                                )}
+                                {business.website && (
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <Globe className="w-4 h-4" />
+                                  </Button>
+                                )}
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MapPin className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {getStatusBadge(business.status)}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </ScrollArea>
               )}
             </div>
 
