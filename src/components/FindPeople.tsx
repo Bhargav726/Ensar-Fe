@@ -140,10 +140,6 @@ export function FindPeople() {
                 <Filter className="w-4 h-4 mr-1" />
                 {showFilters ? 'Hide' : 'Show'} Filters
               </Button>
-              <Button variant="outline" size="sm" onClick={handleClearAllFilters}>
-                <X className="w-4 h-4 mr-1" />
-                Clear Filters
-              </Button>
             </div>
 
             <div className="flex items-center gap-2">
