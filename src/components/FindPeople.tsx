@@ -148,14 +148,9 @@ export function FindPeople() {
                 Create workflow
                 <ChevronDown className="w-4 h-4 ml-1" />
               </Button>
-              <Button variant="outline">Save as new search</Button>
-              <Button variant="outline">
-                Relevance
-                <ChevronDown className="w-4 h-4 ml-1" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Settings className="w-4 h-4" />
-              </Button>
+              
+              
+              
             </div>
           </div>
         </div>
