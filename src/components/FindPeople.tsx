@@ -1,11 +1,9 @@
-
 import { useState, useEffect } from "react"
 import { Search, Filter, Settings, Plus, ChevronDown, ArrowUpDown, Phone, Globe, MapPin } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { PersonDetail } from "./PersonDetail"
 import { MultiSelectDropdown } from "./MultiSelectDropdown"
 import mockData from "../data/mockBusinesses.json"
@@ -59,7 +57,7 @@ export function FindPeople() {
     .sort((a, b) => a.label.localeCompare(b.label))
 
   const filterBusinesses = () => {
-    let filtered = mockData.businesses
+    let filtered = mockData.businesses as Business[]
 
     // Filter by search term
     if (searchTerm) {
@@ -161,10 +159,10 @@ export function FindPeople() {
   }
 
   return (
-    <div className="flex h-full">
-      <div className="flex-1 flex flex-col">
+    <div className="flex h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="border-b border-border p-4 bg-background">
+        <div className="border-b border-border p-4 bg-background flex-shrink-0">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-semibold">Find Businesses</h1>
             <div className="flex items-center gap-2">
@@ -231,8 +229,8 @@ export function FindPeople() {
         <div className="flex flex-1 overflow-hidden">
           {/* Filters Sidebar */}
           {showFilters && (
-            <div className="w-80 border-r border-border bg-muted/10">
-              <div className="p-4">
+            <div className="w-80 border-r border-border bg-muted/10 flex-shrink-0">
+              <div className="p-4 h-full overflow-y-auto">
                 <h2 className="font-semibold mb-4">Filters</h2>
                 <div className="space-y-4">
                   <div>
@@ -307,9 +305,9 @@ export function FindPeople() {
           )}
 
           {/* Main Content */}
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col overflow-hidden">
             {/* Stats */}
-            <div className="border-b border-border p-4 bg-background">
+            <div className="border-b border-border p-4 bg-background flex-shrink-0">
               <div className="flex items-center gap-8 text-sm">
                 <div>
                   <span className="text-muted-foreground">
@@ -319,103 +317,101 @@ export function FindPeople() {
               </div>
             </div>
 
-            {/* Table Container with Scrollbars */}
-            <div className="flex-1 overflow-hidden">
+            {/* Table Container with Scrollbars - Only for table */}
+            <div className="flex-1 overflow-hidden relative">
               {loading ? (
                 <div className="flex items-center justify-center h-64">
                   <div className="text-muted-foreground">Loading...</div>
                 </div>
               ) : (
-                <ScrollArea className="h-full w-full">
-                  <div className="min-w-[800px]">
-                    <Table>
-                      <TableHeader className="sticky top-0 bg-background z-10">
-                        <TableRow>
-                          <TableHead className="sticky left-0 bg-background z-20 min-w-[200px]">
-                            <div className="flex items-center gap-1">
-                              BUSINESS
-                              <ArrowUpDown className="w-4 h-4" />
+                <div className="h-full overflow-auto">
+                  <Table>
+                    <TableHeader className="sticky top-0 bg-background z-10 border-b">
+                      <TableRow>
+                        <TableHead className="sticky left-0 bg-background z-20 min-w-[200px] border-r">
+                          <div className="flex items-center gap-1">
+                            BUSINESS
+                            <ArrowUpDown className="w-4 h-4" />
+                          </div>
+                        </TableHead>
+                        <TableHead className="min-w-[300px]">
+                          <div className="flex items-center gap-1">
+                            ADDRESS
+                          </div>
+                        </TableHead>
+                        <TableHead className="min-w-[150px]">
+                          <div className="flex items-center gap-1">
+                            TYPE
+                          </div>
+                        </TableHead>
+                        <TableHead className="min-w-[120px]">
+                          <div className="flex items-center gap-1">
+                            RATING
+                          </div>
+                        </TableHead>
+                        <TableHead className="min-w-[120px]">
+                          <div className="flex items-center gap-1">
+                            CONTACT
+                          </div>
+                        </TableHead>
+                        <TableHead className="min-w-[100px]">
+                          <div className="flex items-center gap-1">
+                            STATUS
+                          </div>
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {businesses.map((business) => (
+                        <TableRow 
+                          key={business.id}
+                          className="cursor-pointer hover:bg-muted/50"
+                          onClick={() => setSelectedBusiness(business)}
+                        >
+                          <TableCell className="sticky left-0 bg-background border-r">
+                            <div className="font-medium text-blue-600 hover:underline">
+                              {business.name}
                             </div>
-                          </TableHead>
-                          <TableHead className="min-w-[300px]">
-                            <div className="flex items-center gap-1">
-                              ADDRESS
-                            </div>
-                          </TableHead>
-                          <TableHead className="min-w-[150px]">
-                            <div className="flex items-center gap-1">
-                              TYPE
-                            </div>
-                          </TableHead>
-                          <TableHead className="min-w-[120px]">
-                            <div className="flex items-center gap-1">
-                              RATING
-                            </div>
-                          </TableHead>
-                          <TableHead className="min-w-[120px]">
-                            <div className="flex items-center gap-1">
-                              CONTACT
-                            </div>
-                          </TableHead>
-                          <TableHead className="min-w-[100px]">
-                            <div className="flex items-center gap-1">
-                              STATUS
-                            </div>
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {businesses.map((business) => (
-                          <TableRow 
-                            key={business.id}
-                            className="cursor-pointer hover:bg-muted/50"
-                            onClick={() => setSelectedBusiness(business)}
-                          >
-                            <TableCell className="sticky left-0 bg-background border-r">
-                              <div className="font-medium text-blue-600 hover:underline">
-                                {business.name}
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-sm text-muted-foreground">
-                              {business.address}
-                            </TableCell>
-                            <TableCell className="text-sm text-muted-foreground">
-                              {business.type}
-                            </TableCell>
-                            <TableCell>
-                              {business.rating && business.reviewCount ? formatRating(business.rating, business.reviewCount) : '-'}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                {business.phone && (
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                    <Phone className="w-4 h-4" />
-                                  </Button>
-                                )}
-                                {business.website && (
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                    <Globe className="w-4 h-4" />
-                                  </Button>
-                                )}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {business.address}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {business.type}
+                          </TableCell>
+                          <TableCell>
+                            {business.rating && business.reviewCount ? formatRating(business.rating, business.reviewCount) : '-'}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {business.phone && (
                                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                  <MapPin className="w-4 h-4" />
+                                  <Phone className="w-4 h-4" />
                                 </Button>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              {getStatusBadge(business.status)}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </ScrollArea>
+                              )}
+                              {business.website && (
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <Globe className="w-4 h-4" />
+                                </Button>
+                              )}
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <MapPin className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {getStatusBadge(business.status)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
             </div>
 
             {/* Pagination */}
-            <div className="border-t border-border p-4 bg-background">
+            <div className="border-t border-border p-4 bg-background flex-shrink-0">
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
