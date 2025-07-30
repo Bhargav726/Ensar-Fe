@@ -37,10 +37,6 @@ export function ColumnContextMenu({
         {children}
       </ContextMenuTrigger>
       <ContextMenuContent className="w-48">
-        <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-          {columnLabel}
-        </div>
-        <ContextMenuSeparator />
         
         <ContextMenuItem onClick={() => onSort(columnKey, 'asc')}>
           <ArrowUp className="w-4 h-4 mr-2" />
@@ -51,8 +47,6 @@ export function ColumnContextMenu({
           <ArrowDown className="w-4 h-4 mr-2" />
           Sort descending
         </ContextMenuItem>
-        
-        <ContextMenuSeparator />
         
         <ContextMenuItem 
           onClick={() => onMove(columnKey, 'left')}
@@ -69,8 +63,6 @@ export function ColumnContextMenu({
           <MoveRight className="w-4 h-4 mr-2" />
           Move right
         </ContextMenuItem>
-        
-        <ContextMenuSeparator />
         
         <ContextMenuItem onClick={() => onFreeze(columnKey)}>
           <Snowflake className="w-4 h-4 mr-2" />
