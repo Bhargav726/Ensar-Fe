@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Filter, Settings, Plus, ChevronDown } from "lucide-react";
+import { Search, Filter, Settings, Plus, ChevronDown, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
@@ -7,6 +7,7 @@ import { PersonDetail } from "./PersonDetail";
 import { MultiSelectDropdown } from "./MultiSelectDropdown";
 import { ResizableTable } from "./ResizableTable";
 import mockData from "../data/mockBusinesses.json";
+
 interface Business {
   id: string;
   name: string;
@@ -21,6 +22,7 @@ interface Business {
   state: string;
   country: string;
 }
+
 export function FindPeople() {
   const [showFilters, setShowFilters] = useState(true);
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
@@ -36,7 +38,6 @@ export function FindPeople() {
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const itemsPerPage = 10;
 
-  // Extract unique options from mock data
   const typeOptions = Array.from(new Set(mockData.businesses.map(b => b.type))).map(type => ({
     value: type,
     label: type
@@ -53,35 +54,32 @@ export function FindPeople() {
     value: country,
     label: country
   })).sort((a, b) => a.label.localeCompare(b.label));
+
   const filterBusinesses = () => {
     let filtered = mockData.businesses as Business[];
 
-    // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(business => business.name.toLowerCase().includes(searchTerm.toLowerCase()) || business.address.toLowerCase().includes(searchTerm.toLowerCase()) || business.type.toLowerCase().includes(searchTerm.toLowerCase()));
     }
 
-    // Filter by selected types
     if (selectedTypes.length > 0) {
       filtered = filtered.filter(business => selectedTypes.includes(business.type));
     }
 
-    // Filter by selected cities
     if (selectedCities.length > 0) {
       filtered = filtered.filter(business => selectedCities.includes(business.city));
     }
 
-    // Filter by selected states
     if (selectedStates.length > 0) {
       filtered = filtered.filter(business => selectedStates.includes(business.state));
     }
 
-    // Filter by selected countries
     if (selectedCountries.length > 0) {
       filtered = filtered.filter(business => selectedCountries.includes(business.country));
     }
     return filtered;
   };
+
   const applyFiltersAndPagination = () => {
     setLoading(true);
     const filtered = filterBusinesses();
@@ -95,16 +93,20 @@ export function FindPeople() {
     setTotalPages(totalPagesCalculated);
     setLoading(false);
   };
+
   useEffect(() => {
     applyFiltersAndPagination();
   }, [currentPage, searchTerm, selectedTypes, selectedCities, selectedStates, selectedCountries]);
+
   const handleSearch = () => {
     setCurrentPage(1);
     applyFiltersAndPagination();
   };
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
+
   const handleClearAllFilters = () => {
     setSearchTerm("");
     setSelectedTypes([]);
@@ -113,9 +115,11 @@ export function FindPeople() {
     setSelectedCountries([]);
     setCurrentPage(1);
   };
+
   if (selectedBusiness) {
     return <PersonDetail person={selectedBusiness} onBack={() => setSelectedBusiness(null)} />;
   }
+
   return <div className="flex h-screen overflow-hidden">
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
@@ -179,10 +183,10 @@ export function FindPeople() {
                 </div>
 
                 <div className="mt-6 pt-4 border-t">
-                  <Button variant="outline" size="sm" className="w-full mb-2" onClick={handleSearch}>
-                    Apply Filters
+                  <Button variant="outline" size="sm" className="w-full" onClick={handleClearAllFilters}>
+                    <X className="w-4 h-4 mr-1" />
+                    Clear Filters
                   </Button>
-                  
                 </div>
               </div>
             </div>}

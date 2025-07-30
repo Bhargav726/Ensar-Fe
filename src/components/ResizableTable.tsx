@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Phone, Globe, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnContextMenu } from "./ColumnContextMenu"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
@@ -37,6 +38,7 @@ interface ResizableTableProps {
 }
 
 const initialColumns: Column[] = [
+  { key: 'checkbox', label: '', minWidth: 50, initialWidth: 50, sticky: true, order: -1 },
   { key: 'name', label: 'BUSINESS', minWidth: 150, initialWidth: 200, sticky: true, order: 0 },
   { key: 'address', label: 'ADDRESS', minWidth: 200, initialWidth: 300, order: 1 },
   { key: 'type', label: 'TYPE', minWidth: 120, initialWidth: 150, order: 2 },
@@ -55,6 +57,8 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
   const [isResizing, setIsResizing] = useState(false)
   const [resizingColumn, setResizingColumn] = useState<string | null>(null)
   const [dragLine, setDragLine] = useState<{ show: boolean; x: number }>({ show: false, x: 0 })
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
+  const [selectAll, setSelectAll] = useState(false)
   
   const tableRef = useRef<HTMLDivElement>(null)
   const startXRef = useRef<number>(0)
@@ -87,6 +91,28 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
     
     setSortedBusinesses(sorted)
   }, [businesses, sortConfig])
+
+  // Handle select all checkbox
+  const handleSelectAll = (checked: boolean) => {
+    setSelectAll(checked)
+    if (checked) {
+      setSelectedRows(new Set(businesses.map(b => b.id)))
+    } else {
+      setSelectedRows(new Set())
+    }
+  }
+
+  // Handle individual row checkbox
+  const handleRowSelect = (businessId: string, checked: boolean) => {
+    const newSelected = new Set(selectedRows)
+    if (checked) {
+      newSelected.add(businessId)
+    } else {
+      newSelected.delete(businessId)
+    }
+    setSelectedRows(newSelected)
+    setSelectAll(newSelected.size === businesses.length && businesses.length > 0)
+  }
 
   const handleMouseDown = useCallback((e: React.MouseEvent, columnKey: string) => {
     e.preventDefault()
@@ -147,7 +173,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
     const sortedColumns = [...columns].sort((a, b) => a.order - b.order)
     const currentIndex = sortedColumns.findIndex(col => col.key === columnKey)
     
-    if (direction === 'left' && currentIndex > 1) { // Don't move past the name column (index 0)
+    if (direction === 'left' && currentIndex > 1) {
       const targetColumn = sortedColumns[currentIndex - 1]
       setColumns(prev => prev.map(col => {
         if (col.key === columnKey) return { ...col, order: targetColumn.order }
@@ -193,15 +219,16 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
       </span>
     )
   }
+
   const getStickyLeft = (index: number) => {
-  let left = 0;
-  for (let i = 0; i < index; i++) {
-    if (sortedColumns[i].sticky) {
-      left += columnWidths[sortedColumns[i].key];
+    let left = 0;
+    for (let i = 0; i < index; i++) {
+      if (sortedColumns[i].sticky) {
+        left += columnWidths[sortedColumns[i].key];
+      }
     }
+    return left;
   }
-  return left;
-}
 
   if (loading) {
     return (
@@ -215,215 +242,266 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
 
   return (
     <TooltipProvider>
-  <div ref={tableRef} className="relative h-full overflow-auto">
-    {dragLine.show && (
-      <div 
-        className="absolute top-0 bottom-0 w-0.5 bg-blue-500 z-30 pointer-events-none"
-        style={{ left: `${dragLine.x}px` }}
-      />
-    )}
-    <Table>
-      <TableHeader className="sticky top-0 bg-background z-40">
-        <TableRow>
-          {sortedColumns.map((column, index) => (
-            <ColumnContextMenu
-              key={column.key}
-              columnKey={column.key}
-              columnLabel={column.label}
-              onSort={handleSort}
-              onMove={handleMove}
-              onFreeze={handleFreeze}
-              canMoveLeft={index > 1}
-              canMoveRight={index < sortedColumns.length - 1}
-              isFrozen={!!column.sticky}
-            >
-              <TableHead 
-                className={`relative cursor-pointer select-none ${
-                  column.sticky ? 'sticky bg-background z-40 border-r' : ''
-                }`}
-                style={{ 
-                  width: `${columnWidths[column.key]}px`,
-                  minWidth: `${columnWidths[column.key]}px`,
-                  maxWidth: `${columnWidths[column.key]}px`,
-                  ...(column.sticky && {
-                    left: `${getStickyLeft(index)}px`,
-                    zIndex: 40,
-                  })
-                }}
-              >
-                <div className="flex items-center gap-1 pr-4">
-                  {column.label}
-                  {sortConfig?.key === column.key && (
-                    <span className="text-xs">
-                      {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                    </span>
-                  )}
-                </div>
-                <div
-                  className="absolute top-0 right-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500/20 group"
-                  onMouseDown={(e) => handleMouseDown(e, column.key)}
+      <div className="relative h-full flex flex-col">
+        {/* Fixed Header */}
+        <div className="sticky top-0 z-40 bg-background border-b">
+          {dragLine.show && (
+            <div 
+              className="absolute top-0 bottom-0 w-0.5 bg-blue-500 z-30 pointer-events-none"
+              style={{ left: `${dragLine.x}px` }}
+            />
+          )}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {sortedColumns.map((column, index) => {
+                  if (column.key === 'checkbox') {
+                    return (
+                      <TableHead 
+                        key={column.key}
+                        className="sticky bg-background z-50 border-r"
+                        style={{ 
+                          width: `${columnWidths[column.key]}px`,
+                          minWidth: `${columnWidths[column.key]}px`,
+                          maxWidth: `${columnWidths[column.key]}px`,
+                          left: `0px`,
+                        }}
+                      >
+                        <Checkbox
+                          checked={selectAll}
+                          onCheckedChange={handleSelectAll}
+                        />
+                      </TableHead>
+                    )
+                  }
+
+                  return (
+                    <ColumnContextMenu
+                      key={column.key}
+                      columnKey={column.key}
+                      columnLabel={column.label}
+                      onSort={handleSort}
+                      onMove={handleMove}
+                      onFreeze={handleFreeze}
+                      canMoveLeft={index > 1}
+                      canMoveRight={index < sortedColumns.length - 1}
+                      isFrozen={!!column.sticky}
+                    >
+                      <TableHead 
+                        className={`relative cursor-pointer select-none ${
+                          column.sticky ? 'sticky bg-background z-40 border-r' : ''
+                        }`}
+                        style={{ 
+                          width: `${columnWidths[column.key]}px`,
+                          minWidth: `${columnWidths[column.key]}px`,
+                          maxWidth: `${columnWidths[column.key]}px`,
+                          ...(column.sticky && {
+                            left: `${getStickyLeft(index)}px`,
+                          })
+                        }}
+                      >
+                        <div className="flex items-center gap-1 pr-4">
+                          {column.label}
+                          {sortConfig?.key === column.key && (
+                            <span className="text-xs">
+                              {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                            </span>
+                          )}
+                        </div>
+                        {column.key !== 'checkbox' && (
+                          <div
+                            className="absolute top-0 right-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500/20 group"
+                            onMouseDown={(e) => handleMouseDown(e, column.key)}
+                          >
+                            <div className="absolute top-1/2 right-0 w-0.5 h-4 bg-border group-hover:bg-blue-500 transform -translate-y-1/2" />
+                          </div>
+                        )}
+                      </TableHead>
+                    </ColumnContextMenu>
+                  )
+                })}
+              </TableRow>
+            </TableHeader>
+          </Table>
+        </div>
+
+        {/* Scrollable Body */}
+        <div className="flex-1 overflow-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <style jsx>{`
+            div::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
+          <Table>
+            <TableBody>
+              {sortedBusinesses.map((business) => (
+                <TableRow 
+                  key={business.id}
+                  className="hover:bg-muted/50"
                 >
-                  <div className="absolute top-1/2 right-0 w-0.5 h-4 bg-border group-hover:bg-blue-500 transform -translate-y-1/2" />
-                </div>
-              </TableHead>
-            </ColumnContextMenu>
-          ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {sortedBusinesses.map((business) => (
-          <TableRow 
-            key={business.id}
-            className="cursor-pointer hover:bg-muted/50"
-            onClick={() => onBusinessClick(business)}
-          >
-            {sortedColumns.map((column, index) => {
-              const cellStyle = {
-                width: `${columnWidths[column.key]}px`,
-                minWidth: `${columnWidths[column.key]}px`,
-                maxWidth: `${columnWidths[column.key]}px`,
-                ...(column.sticky && {
-                  left: `${getStickyLeft(index)}px`,
-                  zIndex: 20,
-                })
-              };
+                  {sortedColumns.map((column, index) => {
+                    const cellStyle = {
+                      width: `${columnWidths[column.key]}px`,
+                      minWidth: `${columnWidths[column.key]}px`,
+                      maxWidth: `${columnWidths[column.key]}px`,
+                      ...(column.sticky && {
+                        left: `${getStickyLeft(index)}px`,
+                        zIndex: 20,
+                      })
+                    };
 
-              if (column.key === 'name') {
-                return (
-                  <TableCell 
-                    key={column.key}
-                    className="sticky bg-background border-r z-20"
-                    style={cellStyle}
-                  >
-                    <div 
-                      className="underline truncate"
-                      style={{ width: `${columnWidths.name - 24}px` }}
-                      title={business.name}
-                    >
-                      {business.name}
-                    </div>
-                  </TableCell>
-                )
-              }
+                    if (column.key === 'checkbox') {
+                      return (
+                        <TableCell 
+                          key={column.key}
+                          className="sticky bg-background border-r z-30"
+                          style={cellStyle}
+                        >
+                          <Checkbox
+                            checked={selectedRows.has(business.id)}
+                            onCheckedChange={(checked) => handleRowSelect(business.id, checked as boolean)}
+                          />
+                        </TableCell>
+                      )
+                    }
 
-              if (column.key === 'address') {
-                return (
-                  <TableCell 
-                    key={column.key}
-                    className={`text-sm text-muted-foreground ${column.sticky ? 'sticky bg-background border-r' : ''}`}
-                    style={cellStyle}
-                  >
-                    <div 
-                      className="truncate"
-                      style={{ width: `${columnWidths.address - 24}px` }}
-                      title={business.address}
-                    >
-                      {business.address}
-                    </div>
-                  </TableCell>
-                )
-              }
+                    if (column.key === 'name') {
+                      return (
+                        <TableCell 
+                          key={column.key}
+                          className="sticky bg-background border-r z-20 cursor-pointer"
+                          style={cellStyle}
+                          onClick={() => onBusinessClick(business)}
+                        >
+                          <div 
+                            className="underline truncate"
+                            style={{ width: `${columnWidths.name - 24}px` }}
+                            title={business.name}
+                          >
+                            {business.name}
+                          </div>
+                        </TableCell>
+                      )
+                    }
 
-              if (column.key === 'type') {
-                return (
-                  <TableCell 
-                    key={column.key}
-                    className={`text-sm text-muted-foreground ${column.sticky ? 'sticky bg-background border-r' : ''}`}
-                    style={cellStyle}
-                  >
-                    <div 
-                      className="truncate"
-                      style={{ width: `${columnWidths.type - 24}px` }}
-                      title={business.type}
-                    >
-                      {business.type}
-                    </div>
-                  </TableCell>
-                )
-              }
+                    if (column.key === 'address') {
+                      return (
+                        <TableCell 
+                          key={column.key}
+                          className={`text-sm text-muted-foreground ${column.sticky ? 'sticky bg-background border-r' : ''}`}
+                          style={cellStyle}
+                        >
+                          <div 
+                            className="truncate"
+                            style={{ width: `${columnWidths.address - 24}px` }}
+                            title={business.address}
+                          >
+                            {business.address}
+                          </div>
+                        </TableCell>
+                      )
+                    }
 
-              if (column.key === 'rating') {
-                return (
-                  <TableCell
-                    key={column.key}
-                    className={column.sticky ? 'sticky bg-background border-r' : ''}
-                    style={cellStyle}
-                  >
-                    {business.rating && business.reviewCount ? formatRating(business.rating, business.reviewCount) : '-'}
-                  </TableCell>
-                )
-              }
+                    if (column.key === 'type') {
+                      return (
+                        <TableCell 
+                          key={column.key}
+                          className={`text-sm text-muted-foreground ${column.sticky ? 'sticky bg-background border-r' : ''}`}
+                          style={cellStyle}
+                        >
+                          <div 
+                            className="truncate"
+                            style={{ width: `${columnWidths.type - 24}px` }}
+                            title={business.type}
+                          >
+                            {business.type}
+                          </div>
+                        </TableCell>
+                      )
+                    }
 
-              if (column.key === 'contact') {
-                return (
-                  <TableCell
-                    key={column.key}
-                    className={column.sticky ? 'sticky bg-background border-r' : ''}
-                    style={cellStyle}
-                  >
-                    <div className="flex items-center gap-2">
-                      {business.phone && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Phone className="w-4 h-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="bg-gray-900 text-white text-center">
-                            <TooltipPrimitive.Arrow className="fill-gray-900" />
-                            <p>{business.phone}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
-                      {business.website && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Globe className="w-4 h-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="bg-gray-900 text-white text-center">
-                            <TooltipPrimitive.Arrow className="fill-gray-900" />
-                            <p>{business.website}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <MapPin className="w-4 h-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="bg-gray-900 text-white text-center">
-                          <TooltipPrimitive.Arrow className="fill-gray-900" />
-                          <p>{business.address}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                  </TableCell>
-                )
-              }
+                    if (column.key === 'rating') {
+                      return (
+                        <TableCell
+                          key={column.key}
+                          className={column.sticky ? 'sticky bg-background border-r' : ''}
+                          style={cellStyle}
+                        >
+                          {business.rating && business.reviewCount ? formatRating(business.rating, business.reviewCount) : '-'}
+                        </TableCell>
+                      )
+                    }
 
-              if (column.key === 'status') {
-                return (
-                  <TableCell
-                    key={column.key}
-                    className={column.sticky ? 'sticky bg-background border-r' : ''}
-                    style={cellStyle}
-                  >
-                    {getStatusBadge(business.status)}
-                  </TableCell>
-                )
-              }
+                    if (column.key === 'contact') {
+                      return (
+                        <TableCell
+                          key={column.key}
+                          className={column.sticky ? 'sticky bg-background border-r' : ''}
+                          style={cellStyle}
+                        >
+                          <div className="flex items-center gap-2">
+                            {business.phone && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <Phone className="w-4 h-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent className="bg-gray-900 text-white text-center">
+                                  <TooltipPrimitive.Arrow className="fill-gray-900" />
+                                  <p>{business.phone}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                            {business.website && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <Globe className="w-4 h-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent className="bg-gray-900 text-white text-center">
+                                  <TooltipPrimitive.Arrow className="fill-gray-900" />
+                                  <p>{business.website}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MapPin className="w-4 h-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent className="bg-gray-900 text-white text-center">
+                                <TooltipPrimitive.Arrow className="fill-gray-900" />
+                                <p>{business.address}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                        </TableCell>
+                      )
+                    }
 
-              return null;
-            })}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </div>
-</TooltipProvider>
+                    if (column.key === 'status') {
+                      return (
+                        <TableCell
+                          key={column.key}
+                          className={column.sticky ? 'sticky bg-background border-r' : ''}
+                          style={cellStyle}
+                        >
+                          {getStatusBadge(business.status)}
+                        </TableCell>
+                      )
+                    }
 
+                    return null;
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    </TooltipProvider>
   )
 }
