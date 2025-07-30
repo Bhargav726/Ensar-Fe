@@ -159,7 +159,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                 >
                   <div className="flex items-center gap-1 pr-4">
                     {column.label}
-                    {column.key === 'name' && <ArrowUpDown className="w-4 h-4" />}
+                    {column.key === 'name'}
                   </div>
                   <div
                     className="absolute top-0 right-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500/20 group"
