@@ -147,7 +147,6 @@ export function FindPeople() {
                 <Search className="w-4 h-4 absolute left-2 top-2.5 text-muted-foreground" />
                 <Input placeholder="Search businesses..." className="pl-8 w-64" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} />
               </div>
-              <Button onClick={handleSearch}>Search</Button>
               <Button>
                 <Plus className="w-4 h-4 mr-1" />
                 Create workflow
