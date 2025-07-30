@@ -198,7 +198,7 @@ export function FindPeople() {
               <ResizableTable businesses={businesses} onBusinessClick={setSelectedBusiness} loading={loading} />
             </div>
 
-            {/* Pagination */}
+           {/* Pagination */}
 <div className="border-t border-border p-4 bg-background flex-shrink-0 flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
 
   {/* Record Range Info */}
