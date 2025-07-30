@@ -94,7 +94,7 @@
       "reviewCount": 67,
       "phone": "+1 (602) 555-0159",
       "website": "https://phoenixauto.com",
-      "status": "Open",
+      "status": "Closed",
       "city": "Phoenix",
       "state": "AZ",
       "country": "United States"
@@ -164,7 +164,7 @@
       "reviewCount": 267,
       "phone": "+49 89 87654321",
       "website": "https://munichbeer.de",
-      "status": "Open",
+      "status": "Unknown",
       "city": "Munich",
       "state": "Bavaria",
       "country": "Germany"
@@ -206,7 +206,7 @@
       "reviewCount": 56,
       "phone": "+49 40 11223344",
       "website": "https://hamburgship.de",
-      "status": "Open",
+      "status": "Closed",
       "city": "Hamburg",
       "state": "Hamburg",
       "country": "Germany"
@@ -248,7 +248,7 @@
       "reviewCount": 123,
       "phone": "+49 221 55667788",
       "website": "https://cologneart.de",
-      "status": "Open",
+      "status": "Unknown",
       "city": "Cologne",
       "state": "North Rhine-Westphalia",
       "country": "Germany"
@@ -374,7 +374,7 @@
       "reviewCount": 187,
       "phone": "+49 211 77889900",
       "website": "https://dusseldorffashion.de",
-      "status": "Open",
+      "status": "Closed",
       "city": "Düsseldorf",
       "state": "North Rhine-Westphalia",
       "country": "Germany"
@@ -640,7 +640,7 @@
       "reviewCount": 54,
       "phone": "+1 (406) 555-0753",
       "website": "https://helenamining.com",
-      "status": "Open",
+      "status": "Closed",
       "city": "Helena",
       "state": "MT",
       "country": "United States"
