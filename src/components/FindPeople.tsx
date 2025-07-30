@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Search, Filter, Settings, Plus, ChevronDown, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -139,6 +140,10 @@ export function FindPeople() {
                 <Filter className="w-4 h-4 mr-1" />
                 {showFilters ? 'Hide' : 'Show'} Filters
               </Button>
+              <Button variant="outline" size="sm" onClick={handleClearAllFilters}>
+                <X className="w-4 h-4 mr-1" />
+                Clear Filters
+              </Button>
             </div>
 
             <div className="flex items-center gap-2">
@@ -152,9 +157,6 @@ export function FindPeople() {
                 Create workflow
                 <ChevronDown className="w-4 h-4 ml-1" />
               </Button>
-              
-              
-              
             </div>
           </div>
         </div>
@@ -205,15 +207,15 @@ export function FindPeople() {
   <span className="text-sm text-muted-foreground">
     Showing{" "}
     <span className="font-medium text-foreground">
-      {(currentPage - 1) * pageSize + 1}
+      {(currentPage - 1) * itemsPerPage + 1}
     </span>
     –
     <span className="font-medium text-foreground">
-      {Math.min(currentPage * pageSize, totalRecords)}
+      {Math.min(currentPage * itemsPerPage, total)}
     </span>{" "}
     of{" "}
     <span className="font-medium text-foreground">
-      {totalRecords}
+      {total}
     </span>{" "}
     records
   </span>
