@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { Search, Filter, Settings, Plus, ChevronDown, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Filter, Settings, Plus, ChevronDown, X, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
@@ -37,7 +36,7 @@ export function FindPeople() {
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
-  const itemsPerPage = 10;
+  const itemsPerPage = 25;
 
   const typeOptions = Array.from(new Set(mockData.businesses.map(b => b.type))).map(type => ({
     value: type,
@@ -196,64 +195,37 @@ export function FindPeople() {
               <ResizableTable businesses={businesses} onBusinessClick={setSelectedBusiness} loading={loading} />
             </div>
 
-           {/* Pagination */}
-<div className="border-t border-border p-4 bg-background flex-shrink-0 flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
+            {/* Pagination */}
+            <div className="border-t border-border p-4 bg-background flex-shrink-0 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                  disabled={currentPage <= 1}
+                  className="flex items-center gap-1 px-3 py-1.5 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft size={14} />
+                </button>
 
-  {/* Record Range Info */}
-  <span className="text-sm text-muted-foreground">
-    Showing{" "}
-    <span className="font-medium text-foreground">
-      {(currentPage - 1) * itemsPerPage + 1}
-    </span>
-    –
-    <span className="font-medium text-foreground">
-      {Math.min(currentPage * itemsPerPage, total)}
-    </span>{" "}
-    of{" "}
-    <span className="font-medium text-foreground">
-      {total}
-    </span>{" "}
-    records
-  </span>
+                <div className="flex items-center gap-2 text-sm">
+                  <span>{currentPage}</span>
+                  <div className="flex items-center gap-1 px-2 py-1 border rounded cursor-pointer">
+                    <ChevronUp size={12} />
+                  </div>
+                </div>
 
-  {/* Pagination Controls */}
-  <div className="flex items-center justify-center gap-2">
-    {/* Previous */}
-    <button
-      onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-      className={`px-3 py-1 text-white bg-black border rounded text-sm flex items-center gap-1 ${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}`}
-    >
-      <ChevronLeft size={16} />
-      Prev
-    </button>
+                <button
+                  onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                  disabled={currentPage >= totalPages}
+                  className="flex items-center gap-1 px-3 py-1.5 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight size={14} />
+                </button>
+              </div>
 
-    <span className="text-sm">Page</span>
-
-    <select
-      value={currentPage}
-      onChange={(e) => handlePageChange(Number(e.target.value))}
-      className="px-2 py-1 border rounded text-sm cursor-pointer"
-      style={{ maxHeight: "200px", overflowY: "auto" }}
-    >
-      {Array.from({ length: totalPages }, (_, i) => (
-        <option key={i + 1} value={i + 1}>
-          {i + 1}
-        </option>
-      ))}
-    </select>
-
-    <span className="text-sm">of {totalPages}</span>
-
-    {/* Next */}
-    <button
-      onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-      className={`px-3 py-1 text-white bg-black border rounded text-sm flex items-center gap-1 ${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}`}
-    >
-      Next
-      <ChevronRight size={16} />
-    </button>
-  </div>
-</div>
+              <span className="text-sm text-muted-foreground">
+                {currentPage} - {itemsPerPage} of {(total / 1000000).toFixed(1)}M
+              </span>
+            </div>
           </div>
         </div>
       </div>
