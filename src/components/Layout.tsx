@@ -12,7 +12,7 @@ export function Layout({ children }: LayoutProps) {
   <div className="flex min-h-screen w-full overflow-hidden bg-background">
     <AppSidebar />
     
-    <main className="flex flex-1 flex-col overflow-hidden">
+    <main className="flex flex-1 flex-col">
       <header className="h-12 flex items-center border-b border-border bg-background px-4 shrink-0">
         <SidebarTrigger className="mr-2" />
         <div className="flex items-center gap-2">
