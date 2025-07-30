@@ -76,10 +76,10 @@ export function MultiSelectDropdown({
           >
             <div className="flex items-center gap-2 flex-1">
               <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span className="text-sm font-medium">{label}</span>
                 {selectedValues.length > 0 && (
                   <>
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm font-medium">{label}</span>
                     <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
                       {selectedValues.length}
                     </span>
