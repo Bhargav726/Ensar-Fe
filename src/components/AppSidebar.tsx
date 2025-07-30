@@ -29,9 +29,7 @@ import {
 import { Button } from "@/components/ui/button"
 
 const mainItems = [
-  { title: "Home", url: "/", icon: Home },
-  { title: "Workflows", url: "/workflows", icon: BarChart3 },
-  { title: "Analytics", url: "/analytics", icon: BarChart3 },
+  { title: "Home", url: "/", icon: Home }
 ]
 
 const prospectItems = [
