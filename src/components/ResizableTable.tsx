@@ -187,7 +187,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                   }}
                 >
                   <div 
-                    className="font-medium text-blue-600 hover:underline truncate"
+                    className="font-medium text-blue-600 underline truncate"
                     style={{ width: `${columnWidths.name - 24}px` }}
                     title={business.name}
                   >
