@@ -299,43 +299,41 @@ export function FindPeople() {
             </div>
 
             {/* Pagination */}
-<div className="border-t border-border p-4 bg-background flex-shrink-0 flex items-center justify-between">
+<div className="border-t border-border p-4 bg-background flex-shrink-0 flex items-center justify-center gap-2">
   <button
     onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-    className={`px-3 py-1 border rounded ${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}`}
+    className={`px-3 py-1 border rounded text-sm ${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}`}
   >
-    Previous
+    ← Previous
   </button>
 
-  <div className="flex items-center gap-2">
-    <span className="text-sm">Page</span>
+  <span className="text-sm">Page</span>
 
-    <div className="relative">
-      <select
-        value={currentPage}
-        onChange={(e) => handlePageChange(Number(e.target.value))}
-        className="appearance-none px-3 py-1 border rounded shadow-sm bg-white text-sm cursor-pointer max-h-[40px] overflow-y-auto"
-        style={{
-          maxHeight: "200px",
-          overflowY: "auto",
-        }}
-      >
-        {Array.from({ length: totalPages }, (_, i) => (
-          <option key={i + 1} value={i + 1}>
-            {i + 1}
-          </option>
-        ))}
-      </select>
-    </div>
-
-    <span className="text-sm">of {totalPages}</span>
+  <div className="relative">
+    <select
+      value={currentPage}
+      onChange={(e) => handlePageChange(Number(e.target.value))}
+      className="px-2 py-1 border rounded text-sm cursor-pointer max-h-[40px]"
+      style={{
+        maxHeight: "200px",
+        overflowY: "auto",
+      }}
+    >
+      {Array.from({ length: totalPages }, (_, i) => (
+        <option key={i + 1} value={i + 1}>
+          {i + 1}
+        </option>
+      ))}
+    </select>
   </div>
+
+  <span className="text-sm">of {totalPages}</span>
 
   <button
     onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-    className={`px-3 py-1 border rounded ${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}`}
+    className={`px-3 py-1 border rounded text-sm ${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}`}
   >
-    Next
+    Next →
   </button>
 </div>
           </div>
