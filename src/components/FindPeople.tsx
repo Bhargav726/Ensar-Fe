@@ -268,15 +268,30 @@ export function FindPeople() {
           )}
 
           {/* Main Content */}
-          <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Table Container */}
-            <div className="flex-1 overflow-hidden">
-              <ResizableTable 
-                businesses={businesses}
-                onBusinessClick={setSelectedBusiness}
-                loading={loading}
-              />
-            </div>
+<div className="flex-1 flex flex-col overflow-hidden">
+  {/* Header stays visible, only body scrolls */}
+  <div className="flex-1 relative">
+    {/* Table header sits above */}
+    <div className="z-10">
+      <ResizableTable
+        businesses={businesses}
+        onBusinessClick={setSelectedBusiness}
+        loading={loading}
+        renderHeaderOnly
+      />
+    </div>
+
+    {/* Scrollable body (no double header scroll) */}
+    <div className="absolute top-[44px] bottom-0 left-0 right-0 overflow-auto">
+      <ResizableTable
+        businesses={businesses}
+        onBusinessClick={setSelectedBusiness}
+        loading={loading}
+        renderBodyOnly
+      />
+    </div>
+  </div>
+</div>
 
             {/* Pagination */}
 <div className="border-t border-border p-4 bg-background flex-shrink-0 flex items-center justify-center gap-2">
