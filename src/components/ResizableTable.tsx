@@ -1,8 +1,9 @@
-
 import { useState, useRef, useCallback, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ArrowUpDown, Phone, Globe, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
 interface Column {
   key: string
@@ -135,140 +136,166 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
   }
 
   return (
-    <div ref={tableRef} className="relative h-full overflow-auto">
-      {dragLine.show && (
-        <div 
-          className="absolute top-0 bottom-0 w-0.5 bg-blue-500 z-30 pointer-events-none"
-          style={{ left: `${dragLine.x}px` }}
-        />
-      )}
-      <Table>
-        <TableHeader className="sticky top-0 bg-background z-20">
-          <TableRow>
-            {defaultColumns.map((column) => (
-              <TableHead 
-                key={column.key}
-                className={`${column.sticky ? 'sticky left-0 bg-background z-30 border-r' : ''} relative`}
-                style={{ 
-                  width: `${columnWidths[column.key]}px`,
-                  minWidth: `${columnWidths[column.key]}px`,
-                  maxWidth: `${columnWidths[column.key]}px`
-                }}
-              >
-                <div className="flex items-center gap-1 pr-4">
-                  {column.label}
-                  {column.key === 'name' && <ArrowUpDown className="w-4 h-4" />}
-                </div>
-                <div
-                  className="absolute top-0 right-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500/20 group"
-                  onMouseDown={(e) => handleMouseDown(e, column.key)}
+    <TooltipProvider>
+      <div ref={tableRef} className="relative h-full overflow-auto">
+        {dragLine.show && (
+          <div 
+            className="absolute top-0 bottom-0 w-0.5 bg-blue-500 z-30 pointer-events-none"
+            style={{ left: `${dragLine.x}px` }}
+          />
+        )}
+        <Table>
+          <TableHeader className="sticky top-0 bg-background z-20">
+            <TableRow>
+              {defaultColumns.map((column) => (
+                <TableHead 
+                  key={column.key}
+                  className={`${column.sticky ? 'sticky left-0 bg-background z-30 border-r' : ''} relative`}
+                  style={{ 
+                    width: `${columnWidths[column.key]}px`,
+                    minWidth: `${columnWidths[column.key]}px`,
+                    maxWidth: `${columnWidths[column.key]}px`
+                  }}
                 >
-                  <div className="absolute top-1/2 right-0 w-0.5 h-4 bg-border group-hover:bg-blue-500 transform -translate-y-1/2" />
-                </div>
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {businesses.map((business) => (
-            <TableRow 
-              key={business.id}
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => onBusinessClick(business)}
-            >
-              <TableCell 
-                className="sticky left-0 bg-background border-r z-10"
-                style={{ 
-                  width: `${columnWidths.name}px`,
-                  minWidth: `${columnWidths.name}px`,
-                  maxWidth: `${columnWidths.name}px`
-                }}
-              >
-                <div 
-                  className="font-medium text-blue-600 hover:underline truncate"
-                  style={{ width: `${columnWidths.name - 24}px` }}
-                  title={business.name}
-                >
-                  {business.name}
-                </div>
-              </TableCell>
-              <TableCell 
-                className="text-sm text-muted-foreground"
-                style={{ 
-                  width: `${columnWidths.address}px`,
-                  minWidth: `${columnWidths.address}px`,
-                  maxWidth: `${columnWidths.address}px`
-                }}
-              >
-                <div 
-                  className="truncate"
-                  style={{ width: `${columnWidths.address - 24}px` }}
-                  title={business.address}
-                >
-                  {business.address}
-                </div>
-              </TableCell>
-              <TableCell 
-                className="text-sm text-muted-foreground"
-                style={{ 
-                  width: `${columnWidths.type}px`,
-                  minWidth: `${columnWidths.type}px`,
-                  maxWidth: `${columnWidths.type}px`
-                }}
-              >
-                <div 
-                  className="truncate"
-                  style={{ width: `${columnWidths.type - 24}px` }}
-                  title={business.type}
-                >
-                  {business.type}
-                </div>
-              </TableCell>
-              <TableCell
-                style={{ 
-                  width: `${columnWidths.rating}px`,
-                  minWidth: `${columnWidths.rating}px`,
-                  maxWidth: `${columnWidths.rating}px`
-                }}
-              >
-                {business.rating && business.reviewCount ? formatRating(business.rating, business.reviewCount) : '-'}
-              </TableCell>
-              <TableCell
-                style={{ 
-                  width: `${columnWidths.contact}px`,
-                  minWidth: `${columnWidths.contact}px`,
-                  maxWidth: `${columnWidths.contact}px`
-                }}
-              >
-                <div className="flex items-center gap-2">
-                  {business.phone && (
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                      <Phone className="w-4 h-4" />
-                    </Button>
-                  )}
-                  {business.website && (
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                      <Globe className="w-4 h-4" />
-                    </Button>
-                  )}
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <MapPin className="w-4 h-4" />
-                  </Button>
-                </div>
-              </TableCell>
-              <TableCell
-                style={{ 
-                  width: `${columnWidths.status}px`,
-                  minWidth: `${columnWidths.status}px`,
-                  maxWidth: `${columnWidths.status}px`
-                }}
-              >
-                {getStatusBadge(business.status)}
-              </TableCell>
+                  <div className="flex items-center gap-1 pr-4">
+                    {column.label}
+                    {column.key === 'name' && <ArrowUpDown className="w-4 h-4" />}
+                  </div>
+                  <div
+                    className="absolute top-0 right-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500/20 group"
+                    onMouseDown={(e) => handleMouseDown(e, column.key)}
+                  >
+                    <div className="absolute top-1/2 right-0 w-0.5 h-4 bg-border group-hover:bg-blue-500 transform -translate-y-1/2" />
+                  </div>
+                </TableHead>
+              ))}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody>
+            {businesses.map((business) => (
+              <TableRow 
+                key={business.id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => onBusinessClick(business)}
+              >
+                <TableCell 
+                  className="sticky left-0 bg-background border-r z-10"
+                  style={{ 
+                    width: `${columnWidths.name}px`,
+                    minWidth: `${columnWidths.name}px`,
+                    maxWidth: `${columnWidths.name}px`
+                  }}
+                >
+                  <div 
+                    className="font-medium text-blue-600 hover:underline truncate"
+                    style={{ width: `${columnWidths.name - 24}px` }}
+                    title={business.name}
+                  >
+                    {business.name}
+                  </div>
+                </TableCell>
+                <TableCell 
+                  className="text-sm text-muted-foreground"
+                  style={{ 
+                    width: `${columnWidths.address}px`,
+                    minWidth: `${columnWidths.address}px`,
+                    maxWidth: `${columnWidths.address}px`
+                  }}
+                >
+                  <div 
+                    className="truncate"
+                    style={{ width: `${columnWidths.address - 24}px` }}
+                    title={business.address}
+                  >
+                    {business.address}
+                  </div>
+                </TableCell>
+                <TableCell 
+                  className="text-sm text-muted-foreground"
+                  style={{ 
+                    width: `${columnWidths.type}px`,
+                    minWidth: `${columnWidths.type}px`,
+                    maxWidth: `${columnWidths.type}px`
+                  }}
+                >
+                  <div 
+                    className="truncate"
+                    style={{ width: `${columnWidths.type - 24}px` }}
+                    title={business.type}
+                  >
+                    {business.type}
+                  </div>
+                </TableCell>
+                <TableCell
+                  style={{ 
+                    width: `${columnWidths.rating}px`,
+                    minWidth: `${columnWidths.rating}px`,
+                    maxWidth: `${columnWidths.rating}px`
+                  }}
+                >
+                  {business.rating && business.reviewCount ? formatRating(business.rating, business.reviewCount) : '-'}
+                </TableCell>
+                <TableCell
+                  style={{ 
+                    width: `${columnWidths.contact}px`,
+                    minWidth: `${columnWidths.contact}px`,
+                    maxWidth: `${columnWidths.contact}px`
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    {business.phone && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Phone className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-gray-900 text-white text-center">
+                          <TooltipPrimitive.Arrow className="fill-gray-900" />
+                          <p>{business.phone}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                    {business.website && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Globe className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-gray-900 text-white text-center">
+                          <TooltipPrimitive.Arrow className="fill-gray-900" />
+                          <p>{business.website}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <MapPin className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-gray-900 text-white text-center">
+                        <TooltipPrimitive.Arrow className="fill-gray-900" />
+                        <p>{business.address}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                </TableCell>
+                <TableCell
+                  style={{ 
+                    width: `${columnWidths.status}px`,
+                    minWidth: `${columnWidths.status}px`,
+                    maxWidth: `${columnWidths.status}px`
+                  }}
+                >
+                  {getStatusBadge(business.status)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </TooltipProvider>
   )
 }
