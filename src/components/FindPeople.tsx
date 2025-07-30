@@ -38,7 +38,7 @@ export function FindPeople() {
   const [selectedStates, setSelectedStates] = useState<string[]>([])
   const [selectedCountries, setSelectedCountries] = useState<string[]>([])
 
-  const itemsPerPage = 10
+  const itemsPerPage = 25
 
   // Extract unique options from mock data
   const typeOptions = Array.from(new Set(mockData.businesses.map(b => b.type)))
