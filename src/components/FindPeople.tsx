@@ -299,52 +299,45 @@ export function FindPeople() {
             </div>
 
             {/* Pagination */}
-            <div className="border-t border-border p-4 bg-background flex-shrink-0">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (currentPage > 1) handlePageChange(currentPage - 1)
-                      }}
-                      className={currentPage <= 1 ? "pointer-events-none opacity-50" : ""}
-                    />
-                  </PaginationItem>
-                  
-                  {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                    const page = Math.max(1, currentPage - 2) + i
-                    if (page > totalPages) return null
-                    return (
-                      <PaginationItem key={page}>
-                        <PaginationLink
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            handlePageChange(page)
-                          }}
-                          isActive={currentPage === page}
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    )
-                  })}
-                  
-                  <PaginationItem>
-                    <PaginationNext 
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        if (currentPage < totalPages) handlePageChange(currentPage + 1)
-                      }}
-                      className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
+<div className="border-t border-border p-4 bg-background flex-shrink-0 flex items-center justify-between">
+  <button
+    onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+    className={`px-3 py-1 border rounded ${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}`}
+  >
+    Previous
+  </button>
+
+  <div className="flex items-center gap-2">
+    <span className="text-sm">Page</span>
+
+    <div className="relative">
+      <select
+        value={currentPage}
+        onChange={(e) => handlePageChange(Number(e.target.value))}
+        className="appearance-none px-3 py-1 border rounded shadow-sm bg-white text-sm cursor-pointer max-h-[40px] overflow-y-auto"
+        style={{
+          maxHeight: "200px",
+          overflowY: "auto",
+        }}
+      >
+        {Array.from({ length: totalPages }, (_, i) => (
+          <option key={i + 1} value={i + 1}>
+            {i + 1}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <span className="text-sm">of {totalPages}</span>
+  </div>
+
+  <button
+    onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+    className={`px-3 py-1 border rounded ${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}`}
+  >
+    Next
+  </button>
+</div>
           </div>
         </div>
       </div>
