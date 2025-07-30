@@ -237,7 +237,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                       maxWidth: `${columnWidths[column.key]}px`
                     }}
                   >
-                    <div className="flex items-center gap-1 pr-4">
+                    <div className="sticky flex items-center gap-1 pr-4">
                       {column.label}
                       {sortConfig?.key === column.key && (
                         <span className="text-xs">
