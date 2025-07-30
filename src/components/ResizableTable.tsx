@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnContextMenu } from "./ColumnContextMenu"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
+import { Badge } from "@/components/ui/badge" 
 
 interface Column {
   key: string
@@ -400,22 +401,24 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                     }
 
                     if (column.key === 'type') {
-                      return (
-                        <TableCell 
-                          key={column.key}
-                          className={`text-sm text-muted-foreground ${column.sticky ? 'sticky bg-background border-r' : ''}`}
-                          style={cellStyle}
-                        >
-                          <div 
-                            className="truncate"
-                            style={{ width: `${columnWidths.type - 24}px` }}
-                            title={business.type}
-                          >
-                            {business.type}
-                          </div>
-                        </TableCell>
-                      )
-                    }
+  return (
+    <TableCell 
+      key={column.key}
+      className={`text-sm text-muted-foreground ${column.sticky ? 'sticky bg-background border-r' : ''}`}
+      style={cellStyle}
+    >
+      <div 
+        className="truncate"
+        style={{ width: `${columnWidths.type - 24}px` }}
+        title={business.type}
+      >
+        <Badge variant="secondary">
+          {business.type}
+        </Badge>
+      </div>
+    </TableCell>
+  )
+}
 
                     if (column.key === 'rating') {
                       return (
