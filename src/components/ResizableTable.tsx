@@ -193,6 +193,15 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
       </span>
     )
   }
+  const getStickyLeft = (index: number) => {
+  let left = 0;
+  for (let i = 0; i < index; i++) {
+    if (sortedColumns[i].sticky) {
+      left += columnWidths[sortedColumns[i].key];
+    }
+  }
+  return left;
+}
 
   if (loading) {
     return (
@@ -206,235 +215,215 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
 
   return (
     <TooltipProvider>
-      <div ref={tableRef} className="relative h-full overflow-auto">
-        {dragLine.show && (
-          <div 
-            className="absolute top-0 bottom-0 w-0.5 bg-blue-500 z-30 pointer-events-none"
-            style={{ left: `${dragLine.x}px` }}
-          />
-        )}
-        <Table>
-          <TableHeader className="sticky top-0 bg-background z-40">
-            <TableRow>
-              {sortedColumns.map((column, index) => (
-                <ColumnContextMenu
-                  key={column.key}
-                  columnKey={column.key}
-                  columnLabel={column.label}
-                  onSort={handleSort}
-                  onMove={handleMove}
-                  onFreeze={handleFreeze}
-                  canMoveLeft={index > 1}
-                  canMoveRight={index < sortedColumns.length - 1}
-                  isFrozen={!!column.sticky}
-                >
-                  <TableHead 
-                    className={`${
-                      column.key === 'name' 
-                        ? 'sticky left-0 bg-background z-50 border-r' 
-                        : column.sticky
-                        ? 'sticky bg-background z-30 border-r'
-                        : ''
-                    } relative cursor-pointer select-none`}
-                    style={{ 
-                      width: `${columnWidths[column.key]}px`,
-                      minWidth: `${columnWidths[column.key]}px`,
-                      maxWidth: `${columnWidths[column.key]}px`,
-                      left: column.key === 'name' ? '0px' : 
-                            column.sticky ? `${columnWidths.name}px` : 'auto'
-                    }}
-                  >
-                    <div className="flex items-center gap-1 pr-4">
-                      {column.label}
-                      {sortConfig?.key === column.key && (
-                        <span className="text-xs">
-                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                        </span>
-                      )}
-                    </div>
-                    <div
-                      className="absolute top-0 right-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500/20 group"
-                      onMouseDown={(e) => handleMouseDown(e, column.key)}
-                    >
-                      <div className="absolute top-1/2 right-0 w-0.5 h-4 bg-border group-hover:bg-blue-500 transform -translate-y-1/2" />
-                    </div>
-                  </TableHead>
-                </ColumnContextMenu>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedBusinesses.map((business) => (
-              <TableRow 
-                key={business.id}
-                className="cursor-pointer hover:bg-muted/50"
-                onClick={() => onBusinessClick(business)}
+  <div ref={tableRef} className="relative h-full overflow-auto">
+    {dragLine.show && (
+      <div 
+        className="absolute top-0 bottom-0 w-0.5 bg-blue-500 z-30 pointer-events-none"
+        style={{ left: `${dragLine.x}px` }}
+      />
+    )}
+    <Table>
+      <TableHeader className="sticky top-0 bg-background z-40">
+        <TableRow>
+          {sortedColumns.map((column, index) => (
+            <ColumnContextMenu
+              key={column.key}
+              columnKey={column.key}
+              columnLabel={column.label}
+              onSort={handleSort}
+              onMove={handleMove}
+              onFreeze={handleFreeze}
+              canMoveLeft={index > 1}
+              canMoveRight={index < sortedColumns.length - 1}
+              isFrozen={!!column.sticky}
+            >
+              <TableHead 
+                className={`relative cursor-pointer select-none ${
+                  column.sticky ? 'sticky bg-background z-40 border-r' : ''
+                }`}
+                style={{ 
+                  width: `${columnWidths[column.key]}px`,
+                  minWidth: `${columnWidths[column.key]}px`,
+                  maxWidth: `${columnWidths[column.key]}px`,
+                  ...(column.sticky && {
+                    left: `${getStickyLeft(index)}px`,
+                    zIndex: 40,
+                  })
+                }}
               >
-                {sortedColumns.map((column) => {
-                  if (column.key === 'name') {
-                    return (
-                      <TableCell 
-                        key={column.key}
-                        className="sticky left-0 bg-background border-r z-20"
-                        style={{ 
-                          width: `${columnWidths.name}px`,
-                          minWidth: `${columnWidths.name}px`,
-                          maxWidth: `${columnWidths.name}px`
-                        }}
-                      >
-                        <div 
-                          className="underline truncate"
-                          style={{ width: `${columnWidths.name - 24}px` }}
-                          title={business.name}
-                        >
-                          {business.name}
-                        </div>
-                      </TableCell>
-                    )
-                  }
+                <div className="flex items-center gap-1 pr-4">
+                  {column.label}
+                  {sortConfig?.key === column.key && (
+                    <span className="text-xs">
+                      {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                    </span>
+                  )}
+                </div>
+                <div
+                  className="absolute top-0 right-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500/20 group"
+                  onMouseDown={(e) => handleMouseDown(e, column.key)}
+                >
+                  <div className="absolute top-1/2 right-0 w-0.5 h-4 bg-border group-hover:bg-blue-500 transform -translate-y-1/2" />
+                </div>
+              </TableHead>
+            </ColumnContextMenu>
+          ))}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {sortedBusinesses.map((business) => (
+          <TableRow 
+            key={business.id}
+            className="cursor-pointer hover:bg-muted/50"
+            onClick={() => onBusinessClick(business)}
+          >
+            {sortedColumns.map((column, index) => {
+              const cellStyle = {
+                width: `${columnWidths[column.key]}px`,
+                minWidth: `${columnWidths[column.key]}px`,
+                maxWidth: `${columnWidths[column.key]}px`,
+                ...(column.sticky && {
+                  left: `${getStickyLeft(index)}px`,
+                  zIndex: 20,
+                })
+              };
 
-                  if (column.key === 'address') {
-                    return (
-                      <TableCell 
-                        key={column.key}
-                        className={`text-sm text-muted-foreground ${column.sticky ? 'sticky bg-background border-r z-10' : ''}`}
-                        style={{ 
-                          width: `${columnWidths.address}px`,
-                          minWidth: `${columnWidths.address}px`,
-                          maxWidth: `${columnWidths.address}px`,
-                          left: column.sticky ? `${columnWidths.name}px` : 'auto'
-                        }}
-                      >
-                        <div 
-                          className="truncate"
-                          style={{ width: `${columnWidths.address - 24}px` }}
-                          title={business.address}
-                        >
-                          {business.address}
-                        </div>
-                      </TableCell>
-                    )
-                  }
+              if (column.key === 'name') {
+                return (
+                  <TableCell 
+                    key={column.key}
+                    className="sticky bg-background border-r z-20"
+                    style={cellStyle}
+                  >
+                    <div 
+                      className="underline truncate"
+                      style={{ width: `${columnWidths.name - 24}px` }}
+                      title={business.name}
+                    >
+                      {business.name}
+                    </div>
+                  </TableCell>
+                )
+              }
 
-                  if (column.key === 'type') {
-                    return (
-                      <TableCell 
-                        key={column.key}
-                        className={`text-sm text-muted-foreground ${column.sticky ? 'sticky bg-background border-r z-10' : ''}`}
-                        style={{ 
-                          width: `${columnWidths.type}px`,
-                          minWidth: `${columnWidths.type}px`,
-                          maxWidth: `${columnWidths.type}px`,
-                          left: column.sticky ? `${columnWidths.name}px` : 'auto'
-                        }}
-                      >
-                        <div 
-                          className="truncate"
-                          style={{ width: `${columnWidths.type - 24}px` }}
-                          title={business.type}
-                        >
-                          {business.type}
-                        </div>
-                      </TableCell>
-                    )
-                  }
+              if (column.key === 'address') {
+                return (
+                  <TableCell 
+                    key={column.key}
+                    className={`text-sm text-muted-foreground ${column.sticky ? 'sticky bg-background border-r' : ''}`}
+                    style={cellStyle}
+                  >
+                    <div 
+                      className="truncate"
+                      style={{ width: `${columnWidths.address - 24}px` }}
+                      title={business.address}
+                    >
+                      {business.address}
+                    </div>
+                  </TableCell>
+                )
+              }
 
-                  if (column.key === 'rating') {
-                    return (
-                      <TableCell
-                        key={column.key}
-                        className={column.sticky ? 'sticky bg-background border-r z-10' : ''}
-                        style={{ 
-                          width: `${columnWidths.rating}px`,
-                          minWidth: `${columnWidths.rating}px`,
-                          maxWidth: `${columnWidths.rating}px`,
-                          left: column.sticky ? `${columnWidths.name}px` : 'auto'
-                        }}
-                      >
-                        {business.rating && business.reviewCount ? formatRating(business.rating, business.reviewCount) : '-'}
-                      </TableCell>
-                    )
-                  }
+              if (column.key === 'type') {
+                return (
+                  <TableCell 
+                    key={column.key}
+                    className={`text-sm text-muted-foreground ${column.sticky ? 'sticky bg-background border-r' : ''}`}
+                    style={cellStyle}
+                  >
+                    <div 
+                      className="truncate"
+                      style={{ width: `${columnWidths.type - 24}px` }}
+                      title={business.type}
+                    >
+                      {business.type}
+                    </div>
+                  </TableCell>
+                )
+              }
 
-                  if (column.key === 'contact') {
-                    return (
-                      <TableCell
-                        key={column.key}
-                        className={column.sticky ? 'sticky bg-background border-r z-10' : ''}
-                        style={{ 
-                          width: `${columnWidths.contact}px`,
-                          minWidth: `${columnWidths.contact}px`,
-                          maxWidth: `${columnWidths.contact}px`,
-                          left: column.sticky ? `${columnWidths.name}px` : 'auto'
-                        }}
-                      >
-                        <div className="flex items-center gap-2">
-                          {business.phone && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                  <Phone className="w-4 h-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent className="bg-gray-900 text-white text-center">
-                                <TooltipPrimitive.Arrow className="fill-gray-900" />
-                                <p>{business.phone}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          )}
-                          {business.website && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                  <Globe className="w-4 h-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent className="bg-gray-900 text-white text-center">
-                                <TooltipPrimitive.Arrow className="fill-gray-900" />
-                                <p>{business.website}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          )}
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <MapPin className="w-4 h-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="bg-gray-900 text-white text-center">
-                              <TooltipPrimitive.Arrow className="fill-gray-900" />
-                              <p>{business.address}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
-                      </TableCell>
-                    )
-                  }
+              if (column.key === 'rating') {
+                return (
+                  <TableCell
+                    key={column.key}
+                    className={column.sticky ? 'sticky bg-background border-r' : ''}
+                    style={cellStyle}
+                  >
+                    {business.rating && business.reviewCount ? formatRating(business.rating, business.reviewCount) : '-'}
+                  </TableCell>
+                )
+              }
 
-                  if (column.key === 'status') {
-                    return (
-                      <TableCell
-                        key={column.key}
-                        className={column.sticky ? 'sticky bg-background border-r z-10' : ''}
-                        style={{ 
-                          width: `${columnWidths.status}px`,
-                          minWidth: `${columnWidths.status}px`,
-                          maxWidth: `${columnWidths.status}px`,
-                          left: column.sticky ? `${columnWidths.name}px` : 'auto'
-                        }}
-                      >
-                        {getStatusBadge(business.status)}
-                      </TableCell>
-                    )
-                  }
+              if (column.key === 'contact') {
+                return (
+                  <TableCell
+                    key={column.key}
+                    className={column.sticky ? 'sticky bg-background border-r' : ''}
+                    style={cellStyle}
+                  >
+                    <div className="flex items-center gap-2">
+                      {business.phone && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <Phone className="w-4 h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-gray-900 text-white text-center">
+                            <TooltipPrimitive.Arrow className="fill-gray-900" />
+                            <p>{business.phone}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                      {business.website && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <Globe className="w-4 h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-gray-900 text-white text-center">
+                            <TooltipPrimitive.Arrow className="fill-gray-900" />
+                            <p>{business.website}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MapPin className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-gray-900 text-white text-center">
+                          <TooltipPrimitive.Arrow className="fill-gray-900" />
+                          <p>{business.address}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </TableCell>
+                )
+              }
 
-                  return null
-                })}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </TooltipProvider>
+              if (column.key === 'status') {
+                return (
+                  <TableCell
+                    key={column.key}
+                    className={column.sticky ? 'sticky bg-background border-r' : ''}
+                    style={cellStyle}
+                  >
+                    {getStatusBadge(business.status)}
+                  </TableCell>
+                )
+              }
+
+              return null;
+            })}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </div>
+</TooltipProvider>
+
   )
 }
