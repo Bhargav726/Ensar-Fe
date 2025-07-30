@@ -48,17 +48,7 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-2">
-        <div className="mb-4">
-          <div className="flex items-center gap-2 px-2 py-1 text-sm">
-            <Search className="w-4 h-4" />
-            {!collapsed && <span>Quick search</span>}
-            {!collapsed && <span className="ml-auto text-xs text-muted-foreground">Ctrl+K</span>}
-          </div>
-          <div className="flex items-center gap-2 px-2 py-1 text-sm">
-            <Phone className="w-4 h-4" />
-            {!collapsed && <span>Call</span>}
-          </div>
-        </div>
+        
 
         <SidebarGroup>
           <SidebarGroupContent>
@@ -92,15 +82,12 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Saved records</SidebarGroupLabel>
+          
           <SidebarGroupContent>
             <SidebarMenu>
               {recordItems.map(item => <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <NavLink to={item.url} className="flex items-center gap-2">
-                      <item.icon className="w-4 h-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
+                    
                   </SidebarMenuButton>
                 </SidebarMenuItem>)}
             </SidebarMenu>
@@ -112,10 +99,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={isActive("/lists")}>
-                  <NavLink to="/lists" className="flex items-center gap-2">
-                    <List className="w-4 h-4" />
-                    {!collapsed && <span>Lists</span>}
-                  </NavLink>
+                  
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -123,9 +107,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <div className="mt-auto p-2">
-          {!collapsed && <Button className="w-full bg-yellow-400 hover:bg-yellow-500 text-black">
-              Upgrade
-            </Button>}
+          {!collapsed}
         </div>
 
         <SidebarGroup>
