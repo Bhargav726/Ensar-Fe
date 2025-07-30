@@ -326,12 +326,9 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
         </div>
 
         {/* Scrollable Body */}
-        <div className="flex-1 overflow-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          <style jsx>{`
-            div::-webkit-scrollbar {
-              display: none;
-            }
-          `}</style>
+        <div 
+          className="flex-1 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        >
           <Table>
             <TableBody>
               {sortedBusinesses.map((business) => (
