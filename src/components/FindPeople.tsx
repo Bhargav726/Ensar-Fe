@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react"
-import { Search, Filter, Settings, Plus, ChevronDown } from "lucide-react"
+import { Search, Filter, Settings, Plus, ChevronDown, ArrowUpDown, Phone, Globe, MapPin } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { PersonDetail } from "./PersonDetail"
 import { MultiSelectDropdown } from "./MultiSelectDropdown"
-import { ResizableTable } from "./ResizableTable"
 import mockData from "../data/mockBusinesses.json"
 
 interface Business {
@@ -130,13 +130,37 @@ export function FindPeople() {
     setCurrentPage(1)
   }
 
+  const formatRating = (rating: number, reviewCount: number) => {
+    return (
+      <div className="flex items-center gap-1">
+        <span className="text-yellow-500">★</span>
+        <span className="font-medium">{rating.toFixed(1)}</span>
+        <span className="text-muted-foreground">({reviewCount})</span>
+      </div>
+    )
+  }
+
+  const getStatusBadge = (status: string) => {
+    const statusColors = {
+      'Open': 'bg-green-100 text-green-800',
+      'Closed': 'bg-red-100 text-red-800',
+      'Unknown': 'bg-gray-100 text-gray-800'
+    }
+    
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status as keyof typeof statusColors] || statusColors.Unknown}`}>
+        {status}
+      </span>
+    )
+  }
+
   if (selectedBusiness) {
     return <PersonDetail person={selectedBusiness} onBack={() => setSelectedBusiness(null)} />
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="flex h-screen">
+      <div className="flex-1 flex flex-col">
         {/* Header */}
         <div className="border-b border-border p-4 bg-background flex-shrink-0">
           <div className="flex items-center justify-between mb-4">
@@ -205,7 +229,7 @@ export function FindPeople() {
         <div className="flex flex-1 overflow-hidden">
           {/* Filters Sidebar */}
           {showFilters && (
-            <div className="w-80 border-r border-border bg-muted/10 flex-shrink-0 overflow-hidden">
+            <div className="w-80 border-r border-border bg-muted/10 flex-shrink-0">
               <div className="p-4 h-full overflow-y-auto">
                 <h2 className="font-semibold mb-4">Filters</h2>
                 <div className="space-y-4">
@@ -281,7 +305,7 @@ export function FindPeople() {
           )}
 
           {/* Main Content */}
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 flex flex-col">
             {/* Stats */}
             <div className="border-b border-border p-4 bg-background flex-shrink-0">
               <div className="flex items-center gap-8 text-sm">
@@ -293,13 +317,97 @@ export function FindPeople() {
               </div>
             </div>
 
-            {/* Table Container */}
-            <div className="flex-1 overflow-hidden">
-              <ResizableTable 
-                businesses={businesses}
-                onBusinessClick={setSelectedBusiness}
-                loading={loading}
-              />
+            {/* Table Container with Scrollbars - Only for table */}
+            <div className="flex-1 overflow-hidden relative">
+              {loading ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="text-muted-foreground">Loading...</div>
+                </div>
+              ) : (
+                <div className="h-full">
+                  <Table>
+                    <TableHeader className="sticky top-0 bg-background z-10 border-b">
+                      <TableRow>
+                        <TableHead className="sticky left-0 bg-background z-20 min-w-[200px] border-r">
+                          <div className="flex items-center gap-1">
+                            BUSINESS
+                            <ArrowUpDown className="w-4 h-4" />
+                          </div>
+                        </TableHead>
+                        <TableHead className="min-w-[300px]">
+                          <div className="flex items-center gap-1">
+                            ADDRESS
+                          </div>
+                        </TableHead>
+                        <TableHead className="min-w-[150px]">
+                          <div className="flex items-center gap-1">
+                            TYPE
+                          </div>
+                        </TableHead>
+                        <TableHead className="min-w-[120px]">
+                          <div className="flex items-center gap-1">
+                            RATING
+                          </div>
+                        </TableHead>
+                        <TableHead className="min-w-[120px]">
+                          <div className="flex items-center gap-1">
+                            CONTACT
+                          </div>
+                        </TableHead>
+                        <TableHead className="min-w-[100px]">
+                          <div className="flex items-center gap-1">
+                            STATUS
+                          </div>
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {businesses.map((business) => (
+                        <TableRow 
+                          key={business.id}
+                          className="cursor-pointer hover:bg-muted/50"
+                          onClick={() => setSelectedBusiness(business)}
+                        >
+                          <TableCell className="sticky left-0 bg-background border-r">
+                            <div className="font-medium text-blue-600 hover:underline">
+                              {business.name}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {business.address}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {business.type}
+                          </TableCell>
+                          <TableCell>
+                            {business.rating && business.reviewCount ? formatRating(business.rating, business.reviewCount) : '-'}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {business.phone && (
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <Phone className="w-4 h-4" />
+                                </Button>
+                              )}
+                              {business.website && (
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <Globe className="w-4 h-4" />
+                                </Button>
+                              )}
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <MapPin className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {getStatusBadge(business.status)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </div>
 
             {/* Pagination */}
