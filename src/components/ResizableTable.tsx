@@ -1,4 +1,3 @@
-
 import { useState, useRef, useCallback, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Phone, Globe, MapPin } from "lucide-react"
@@ -225,16 +224,22 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                   onSort={handleSort}
                   onMove={handleMove}
                   onFreeze={handleFreeze}
-                  canMoveLeft={index > 1} // Can't move past the name column
+                  canMoveLeft={index > 1}
                   canMoveRight={index < sortedColumns.length - 1}
                   isFrozen={!!column.sticky}
                 >
                   <TableHead 
-                    className={`${column.sticky ? 'sticky left-0 bg-background z-30 border-r' : ''} relative cursor-pointer select-none`}
+                    className={`${
+                      column.key === 'name' || column.sticky 
+                        ? 'sticky left-0 bg-background z-30 border-r' 
+                        : ''
+                    } relative cursor-pointer select-none`}
                     style={{ 
                       width: `${columnWidths[column.key]}px`,
                       minWidth: `${columnWidths[column.key]}px`,
-                      maxWidth: `${columnWidths[column.key]}px`
+                      maxWidth: `${columnWidths[column.key]}px`,
+                      left: column.key === 'name' ? '0px' : 
+                            column.sticky ? `${columnWidths.name}px` : 'auto'
                     }}
                   >
                     <div className="flex items-center gap-1 pr-4">
