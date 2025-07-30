@@ -159,10 +159,6 @@ export function FindPeople() {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Button variant="outline" size="sm">
-                Default view
-                <ChevronDown className="w-4 h-4 ml-1" />
-              </Button>
               <Button 
                 variant="outline" 
                 size="sm"
