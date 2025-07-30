@@ -1,12 +1,12 @@
 
 import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu"
-import { ArrowUpDown, ArrowUp, ArrowDown, MoveLeft, MoveRight, Snowflake } from "lucide-react"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu"
+import { ArrowUp, ArrowDown, MoveLeft, MoveRight, Snowflake } from "lucide-react"
 
 interface ColumnContextMenuProps {
   children: React.ReactNode
@@ -32,43 +32,44 @@ export function ColumnContextMenu({
   isFrozen
 }: ColumnContextMenuProps) {
   return (
-    <ContextMenu>
-      <ContextMenuTrigger asChild>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
         {children}
-      </ContextMenuTrigger>
-      <ContextMenuContent className="w-48">
-        
-        <ContextMenuItem onClick={() => onSort(columnKey, 'asc')}>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-48">
+        <DropdownMenuItem onClick={() => onSort(columnKey, 'asc')}>
           <ArrowUp className="w-4 h-4 mr-2" />
           Sort ascending
-        </ContextMenuItem>
-        
-        <ContextMenuItem onClick={() => onSort(columnKey, 'desc')}>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem onClick={() => onSort(columnKey, 'desc')}>
           <ArrowDown className="w-4 h-4 mr-2" />
           Sort descending
-        </ContextMenuItem>
-        
-        <ContextMenuItem 
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
           onClick={() => onMove(columnKey, 'left')}
           disabled={!canMoveLeft}
         >
           <MoveLeft className="w-4 h-4 mr-2" />
           Move left
-        </ContextMenuItem>
-        
-        <ContextMenuItem 
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
           onClick={() => onMove(columnKey, 'right')}
           disabled={!canMoveRight}
         >
           <MoveRight className="w-4 h-4 mr-2" />
           Move right
-        </ContextMenuItem>
-        
-        <ContextMenuItem onClick={() => onFreeze(columnKey)}>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem onClick={() => onFreeze(columnKey)}>
           <Snowflake className="w-4 h-4 mr-2" />
           {isFrozen ? 'Unfreeze column' : 'Freeze column'}
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
