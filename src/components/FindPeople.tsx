@@ -269,6 +269,17 @@ export function FindPeople() {
 
           {/* Main Content */}
           <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Stats */}
+            <div className="border-b border-border p-4 bg-background flex-shrink-0">
+              <div className="flex items-center gap-8 text-sm">
+                <div>
+                  <span className="text-muted-foreground">
+                    Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, total)} of {total.toLocaleString()} businesses
+                  </span>
+                </div>
+              </div>
+            </div>
+
             {/* Table Container */}
             <div className="flex-1 overflow-hidden">
               <ResizableTable 
