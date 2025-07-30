@@ -160,7 +160,7 @@ export function FindPeople() {
 
   return (
     <div className="flex h-screen">
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <div className="border-b border-border p-4 bg-background flex-shrink-0">
           <div className="flex items-center justify-between mb-4">
