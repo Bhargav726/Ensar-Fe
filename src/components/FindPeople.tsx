@@ -187,9 +187,7 @@ export function FindPeople() {
                   <Button variant="outline" size="sm" className="w-full mb-2" onClick={handleSearch}>
                     Apply Filters
                   </Button>
-                  <Button variant="link" className="text-sm p-0" onClick={handleClearAllFilters}>
-                    Clear all
-                  </Button>
+                  
                 </div>
               </div>
             </div>}
