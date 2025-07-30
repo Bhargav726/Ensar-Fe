@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Filter, Settings, Plus, ChevronDown, X } from "lucide-react";
+import { Search, Filter, Settings, Plus, ChevronDown, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
@@ -199,33 +199,63 @@ export function FindPeople() {
             </div>
 
             {/* Pagination */}
-          <div className="border-t border-border p-4 bg-background flex-shrink-0 flex items-center justify-center gap-2">
-  <button onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)} className={`px-3 py-1 text-white bg-black border rounded text-sm ${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}`}>
-    ← Previous
-  </button>
+<div className="border-t border-border p-4 bg-background flex-shrink-0 flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
 
-  <span className="text-sm">Page</span>
+  {/* Record Range Info */}
+  <span className="text-sm text-muted-foreground">
+    Showing{" "}
+    <span className="font-medium text-foreground">
+      {(currentPage - 1) * pageSize + 1}
+    </span>
+    –
+    <span className="font-medium text-foreground">
+      {Math.min(currentPage * pageSize, totalRecords)}
+    </span>{" "}
+    of{" "}
+    <span className="font-medium text-foreground">
+      {totalRecords}
+    </span>{" "}
+    records
+  </span>
 
-  <div className="relative">
-    <select value={currentPage} onChange={e => handlePageChange(Number(e.target.value))} className="px-2 py-1 border rounded text-sm cursor-pointer max-h-[40px]" style={{
-                maxHeight: "200px",
-                overflowY: "auto"
-              }}>
-      {Array.from({
-                  length: totalPages
-                }, (_, i) => <option key={i + 1} value={i + 1}>
+  {/* Pagination Controls */}
+  <div className="flex items-center justify-center gap-2">
+    {/* Previous */}
+    <button
+      onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+      className={`px-3 py-1 text-white bg-black border rounded text-sm flex items-center gap-1 ${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}`}
+    >
+      <ChevronLeft size={16} />
+      Prev
+    </button>
+
+    <span className="text-sm">Page</span>
+
+    <select
+      value={currentPage}
+      onChange={(e) => handlePageChange(Number(e.target.value))}
+      className="px-2 py-1 border rounded text-sm cursor-pointer"
+      style={{ maxHeight: "200px", overflowY: "auto" }}
+    >
+      {Array.from({ length: totalPages }, (_, i) => (
+        <option key={i + 1} value={i + 1}>
           {i + 1}
-        </option>)}
+        </option>
+      ))}
     </select>
+
+    <span className="text-sm">of {totalPages}</span>
+
+    {/* Next */}
+    <button
+      onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+      className={`px-3 py-1 text-white bg-black border rounded text-sm flex items-center gap-1 ${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}`}
+    >
+      Next
+      <ChevronRight size={16} />
+    </button>
   </div>
-
-  <span className="text-sm">of {totalPages}</span>
-
-  <button onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)} className={`px-3 py-1 text-white bg-black border rounded text-sm ${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}`}>
-    Next →
-  </button>
-          </div>
-          </div>
+</div>
         </div>
       </div>
     </div>;
