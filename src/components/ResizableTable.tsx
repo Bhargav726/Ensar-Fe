@@ -412,7 +412,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
         style={{ width: `${columnWidths.type - 24}px` }}
         title={business.type}
       >
-        <Badge variant="secondary">
+        <Badge variant="secondary" className="bg-gray-100 text-gray-800 border-gray-300">
           {business.type}
         </Badge>
       </div>
