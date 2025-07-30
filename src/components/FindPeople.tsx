@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { PersonDetail } from "./PersonDetail"
+import { MultiSelectDropdown } from "./MultiSelectDropdown"
+import mockData from "../data/mockBusinesses.json"
 
 interface Business {
   id: string
@@ -17,18 +19,9 @@ interface Business {
   phone?: string
   website?: string
   status: 'Open' | 'Closed' | 'Unknown'
-  coordinates?: {
-    lat: number
-    lng: number
-  }
-}
-
-interface ApiResponse {
-  businesses: Business[]
-  total: number
-  page: number
-  limit: number
-  totalPages: number
+  city: string
+  state: string
+  country: string
 }
 
 export function FindPeople() {
@@ -40,49 +33,102 @@ export function FindPeople() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [total, setTotal] = useState(0)
-  const [selectedTypes, setSelectedTypes] = useState("")
-  const [selectedCities, setSelectedCities] = useState("")
-  const [selectedState, setSelectedState] = useState("all")
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+  const [selectedCities, setSelectedCities] = useState<string[]>([])
+  const [selectedStates, setSelectedStates] = useState<string[]>([])
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([])
 
-  const fetchBusinesses = async (page: number = 1, search: string = "", types: string = "", cities: string = "", state: string = "all") => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: "50",
-        search,
-        types,
-        cities,
-        state
-      })
-      
-      const response = await fetch(`https://ai-business-manager.azurewebsites.net/api/places?${params}`)
-      const data: ApiResponse = await response.json()
-      
-      setBusinesses(data.businesses || [])
-      setTotal(data.total || 0)
-      setCurrentPage(data.page || 1)
-      setTotalPages(data.totalPages || 1)
-    } catch (error) {
-      console.error('Failed to fetch businesses:', error)
-      setBusinesses([])
-    } finally {
-      setLoading(false)
+  const itemsPerPage = 10
+
+  // Extract unique options from mock data
+  const typeOptions = Array.from(new Set(mockData.businesses.map(b => b.type)))
+    .map(type => ({ value: type, label: type }))
+    .sort((a, b) => a.label.localeCompare(b.label))
+
+  const cityOptions = Array.from(new Set(mockData.businesses.map(b => b.city)))
+    .map(city => ({ value: city, label: city }))
+    .sort((a, b) => a.label.localeCompare(b.label))
+
+  const stateOptions = Array.from(new Set(mockData.businesses.map(b => b.state)))
+    .map(state => ({ value: state, label: state }))
+    .sort((a, b) => a.label.localeCompare(b.label))
+
+  const countryOptions = Array.from(new Set(mockData.businesses.map(b => b.country)))
+    .map(country => ({ value: country, label: country }))
+    .sort((a, b) => a.label.localeCompare(b.label))
+
+  const filterBusinesses = () => {
+    let filtered = mockData.businesses
+
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(business =>
+        business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        business.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        business.type.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     }
+
+    // Filter by selected types
+    if (selectedTypes.length > 0) {
+      filtered = filtered.filter(business => selectedTypes.includes(business.type))
+    }
+
+    // Filter by selected cities
+    if (selectedCities.length > 0) {
+      filtered = filtered.filter(business => selectedCities.includes(business.city))
+    }
+
+    // Filter by selected states
+    if (selectedStates.length > 0) {
+      filtered = filtered.filter(business => selectedStates.includes(business.state))
+    }
+
+    // Filter by selected countries
+    if (selectedCountries.length > 0) {
+      filtered = filtered.filter(business => selectedCountries.includes(business.country))
+    }
+
+    return filtered
+  }
+
+  const applyFiltersAndPagination = () => {
+    setLoading(true)
+    
+    const filtered = filterBusinesses()
+    const totalFiltered = filtered.length
+    const totalPagesCalculated = Math.ceil(totalFiltered / itemsPerPage)
+    
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    const paginatedData = filtered.slice(startIndex, endIndex)
+    
+    setBusinesses(paginatedData)
+    setTotal(totalFiltered)
+    setTotalPages(totalPagesCalculated)
+    setLoading(false)
   }
 
   useEffect(() => {
-    fetchBusinesses()
-  }, [])
+    applyFiltersAndPagination()
+  }, [currentPage, searchTerm, selectedTypes, selectedCities, selectedStates, selectedCountries])
 
   const handleSearch = () => {
     setCurrentPage(1)
-    fetchBusinesses(1, searchTerm, selectedTypes, selectedCities, selectedState)
+    applyFiltersAndPagination()
   }
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
-    fetchBusinesses(page, searchTerm, selectedTypes, selectedCities, selectedState)
+  }
+
+  const handleClearAllFilters = () => {
+    setSearchTerm("")
+    setSelectedTypes([])
+    setSelectedCities([])
+    setSelectedStates([])
+    setSelectedCountries([])
+    setCurrentPage(1)
   }
 
   const formatRating = (rating: number, reviewCount: number) => {
@@ -184,7 +230,7 @@ export function FindPeople() {
         <div className="flex flex-1 overflow-hidden">
           {/* Filters Sidebar */}
           {showFilters && (
-            <div className="w-64 border-r border-border bg-muted/10">
+            <div className="w-80 border-r border-border bg-muted/10">
               <div className="p-4">
                 <h2 className="font-semibold mb-4">Filters</h2>
                 <div className="space-y-4">
@@ -198,36 +244,43 @@ export function FindPeople() {
                   </div>
 
                   <div>
-                    <h3 className="font-medium text-sm mb-2">Business Type</h3>
-                    <Input 
-                      placeholder="Search business type..."
-                      value={selectedTypes}
-                      onChange={(e) => setSelectedTypes(e.target.value)}
+                    <MultiSelectDropdown
+                      label="Location"
+                      options={countryOptions}
+                      selectedValues={selectedCountries}
+                      onSelectionChange={setSelectedCountries}
+                      placeholder="Search countries..."
                     />
                   </div>
 
                   <div>
-                    <h3 className="font-medium text-sm mb-2">City</h3>
-                    <Input 
+                    <MultiSelectDropdown
+                      label="State"
+                      options={stateOptions}
+                      selectedValues={selectedStates}
+                      onSelectionChange={setSelectedStates}
+                      placeholder="Search states..."
+                    />
+                  </div>
+
+                  <div>
+                    <MultiSelectDropdown
+                      label="City"
+                      options={cityOptions}
+                      selectedValues={selectedCities}
+                      onSelectionChange={setSelectedCities}
                       placeholder="Search cities..."
-                      value={selectedCities}
-                      onChange={(e) => setSelectedCities(e.target.value)}
                     />
                   </div>
 
                   <div>
-                    <h3 className="font-medium text-sm mb-2">State</h3>
-                    <select 
-                      className="w-full p-2 border rounded"
-                      value={selectedState}
-                      onChange={(e) => setSelectedState(e.target.value)}
-                    >
-                      <option value="all">All States</option>
-                      <option value="IL">Illinois</option>
-                      <option value="CA">California</option>
-                      <option value="NY">New York</option>
-                      <option value="TX">Texas</option>
-                    </select>
+                    <MultiSelectDropdown
+                      label="Business Type"
+                      options={typeOptions}
+                      selectedValues={selectedTypes}
+                      onSelectionChange={setSelectedTypes}
+                      placeholder="Search business types..."
+                    />
                   </div>
                 </div>
 
@@ -243,14 +296,7 @@ export function FindPeople() {
                   <Button 
                     variant="link" 
                     className="text-sm p-0"
-                    onClick={() => {
-                      setSearchTerm("")
-                      setSelectedTypes("")
-                      setSelectedCities("")
-                      setSelectedState("all")
-                      setCurrentPage(1)
-                      fetchBusinesses()
-                    }}
+                    onClick={handleClearAllFilters}
                   >
                     Clear all
                   </Button>
@@ -265,7 +311,9 @@ export function FindPeople() {
             <div className="border-b border-border p-4 bg-background">
               <div className="flex items-center gap-8 text-sm">
                 <div>
-                  <span className="text-muted-foreground">Showing {((currentPage - 1) * 50) + 1} to {Math.min(currentPage * 50, total)} of {total.toLocaleString()} businesses</span>
+                  <span className="text-muted-foreground">
+                    Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, total)} of {total.toLocaleString()} businesses
+                  </span>
                 </div>
               </div>
             </div>
@@ -377,7 +425,8 @@ export function FindPeople() {
                   </PaginationItem>
                   
                   {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                    const page = i + 1
+                    const page = Math.max(1, currentPage - 2) + i
+                    if (page > totalPages) return null
                     return (
                       <PaginationItem key={page}>
                         <PaginationLink
