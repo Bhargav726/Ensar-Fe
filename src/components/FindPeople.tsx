@@ -159,8 +159,8 @@ export function FindPeople() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="flex h-screen">
+      <div className="flex-1 flex flex-col">
         {/* Header */}
         <div className="border-b border-border p-4 bg-background flex-shrink-0">
           <div className="flex items-center justify-between mb-4">
@@ -305,7 +305,7 @@ export function FindPeople() {
           )}
 
           {/* Main Content */}
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 flex flex-col">
             {/* Stats */}
             <div className="border-b border-border p-4 bg-background flex-shrink-0">
               <div className="flex items-center gap-8 text-sm">
