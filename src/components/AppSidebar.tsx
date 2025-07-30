@@ -1,0 +1,179 @@
+
+import { 
+  Home, 
+  Users, 
+  Building2, 
+  DollarSign, 
+  List, 
+  BarChart3, 
+  Search,
+  Phone,
+  Settings,
+  ChevronDown,
+  Star
+} from "lucide-react"
+import { NavLink, useLocation } from "react-router-dom"
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar"
+import { Button } from "@/components/ui/button"
+
+const mainItems = [
+  { title: "Home", url: "/", icon: Home },
+  { title: "Workflows", url: "/workflows", icon: BarChart3 },
+  { title: "Analytics", url: "/analytics", icon: BarChart3 },
+]
+
+const prospectItems = [
+  { title: "Find people", url: "/find-people", icon: Users, active: true },
+  { title: "Find companies", url: "/find-companies", icon: Building2 },
+]
+
+const recordItems = [
+  { title: "People", url: "/people", icon: Users },
+  { title: "Companies", url: "/companies", icon: Building2 },
+  { title: "Deals", url: "/deals", icon: DollarSign },
+]
+
+export function AppSidebar() {
+  const { state } = useSidebar()
+  const location = useLocation()
+  const collapsed = state === "collapsed"
+
+  const isActive = (path: string) => location.pathname === path
+
+  return (
+    <Sidebar className={collapsed ? "w-14" : "w-60"} collapsible>
+      <SidebarHeader className="p-4">
+        {!collapsed && (
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
+              <Star className="w-4 h-4 text-primary-foreground" />
+            </div>
+            <span className="font-semibold text-lg">CRM</span>
+          </div>
+        )}
+      </SidebarHeader>
+
+      <SidebarContent className="px-2">
+        <div className="mb-4">
+          <div className="flex items-center gap-2 px-2 py-1 text-sm">
+            <Search className="w-4 h-4" />
+            {!collapsed && <span>Quick search</span>}
+            {!collapsed && <span className="ml-auto text-xs text-muted-foreground">Ctrl+K</span>}
+          </div>
+          <div className="flex items-center gap-2 px-2 py-1 text-sm">
+            <Phone className="w-4 h-4" />
+            {!collapsed && <span>Call</span>}
+          </div>
+        </div>
+
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {mainItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                    <NavLink to={item.url} className="flex items-center gap-2">
+                      <item.icon className="w-4 h-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Prospect & manage records</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {prospectItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton 
+                    asChild 
+                    isActive={item.active || isActive(item.url)}
+                    className={item.active ? "bg-accent text-accent-foreground font-medium" : ""}
+                  >
+                    <NavLink to={item.url} className="flex items-center gap-2">
+                      <item.icon className="w-4 h-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Saved records</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {recordItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                    <NavLink to={item.url} className="flex items-center gap-2">
+                      <item.icon className="w-4 h-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={isActive("/lists")}>
+                  <NavLink to="/lists" className="flex items-center gap-2">
+                    <List className="w-4 h-4" />
+                    {!collapsed && <span>Lists</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <div className="mt-auto p-2">
+          {!collapsed && (
+            <Button className="w-full bg-yellow-400 hover:bg-yellow-500 text-black">
+              Upgrade
+            </Button>
+          )}
+        </div>
+
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink to="/settings" className="flex items-center gap-2">
+                    <Settings className="w-4 h-4" />
+                    {!collapsed && <span>Admin Settings</span>}
+                    {!collapsed && <ChevronDown className="w-4 h-4 ml-auto" />}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  )
+}
