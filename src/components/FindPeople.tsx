@@ -302,7 +302,7 @@ export function FindPeople() {
 <div className="border-t border-border p-4 bg-background flex-shrink-0 flex items-center justify-center gap-2">
   <button
     onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-    className={`px-3 py-1 border rounded text-sm ${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}`}
+    className={`px-3 py-1 text-white bg-black border rounded text-sm ${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}`}
   >
     ← Previous
   </button>
@@ -331,7 +331,7 @@ export function FindPeople() {
 
   <button
     onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-    className={`px-3 py-1 border rounded text-sm ${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}`}
+    className={`px-3 py-1 text-white bg-black border rounded text-sm ${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}`}
   >
     Next →
   </button>
