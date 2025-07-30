@@ -1,5 +1,5 @@
 
-import { ArrowLeft, Star, Mail, Phone, MapPin, ExternalLink, User, Building2, Calendar } from "lucide-react"
+import { ArrowLeft, Star, Mail, Phone, MapPin, ExternalLink, User, Building2, Calendar, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface Person {
