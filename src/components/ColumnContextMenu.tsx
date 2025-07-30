@@ -80,5 +80,3 @@ export function ColumnContextMenu({
     </ContextMenu>
   )
 }
-</ContextMenuItem>
-</ContextMenu>
