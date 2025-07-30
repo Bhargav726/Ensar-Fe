@@ -255,6 +255,8 @@ export function FindPeople() {
       <ChevronRight size={16} />
     </button>
   </div>
+</div>
+          </div>
         </div>
       </div>
     </div>;
