@@ -214,7 +214,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
           />
         )}
         <Table>
-          <TableHeader className="sticky top-0 bg-background z-20">
+          <TableHeader className="sticky top-0 bg-background z-40">
             <TableRow>
               {sortedColumns.map((column, index) => (
                 <ColumnContextMenu
@@ -230,8 +230,10 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                 >
                   <TableHead 
                     className={`${
-                      column.key === 'name' || column.sticky 
-                        ? 'sticky left-0 bg-background z-30 border-r' 
+                      column.key === 'name' 
+                        ? 'sticky left-0 bg-background z-50 border-r' 
+                        : column.sticky
+                        ? 'sticky bg-background z-30 border-r'
                         : ''
                     } relative cursor-pointer select-none`}
                     style={{ 
@@ -273,7 +275,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                     return (
                       <TableCell 
                         key={column.key}
-                        className="sticky left-0 bg-background border-r z-10"
+                        className="sticky left-0 bg-background border-r z-20"
                         style={{ 
                           width: `${columnWidths.name}px`,
                           minWidth: `${columnWidths.name}px`,
@@ -322,7 +324,8 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                         style={{ 
                           width: `${columnWidths.type}px`,
                           minWidth: `${columnWidths.type}px`,
-                          maxWidth: `${columnWidths.type}px`
+                          maxWidth: `${columnWidths.type}px`,
+                          left: column.sticky ? `${columnWidths.name}px` : 'auto'
                         }}
                       >
                         <div 
@@ -344,7 +347,8 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                         style={{ 
                           width: `${columnWidths.rating}px`,
                           minWidth: `${columnWidths.rating}px`,
-                          maxWidth: `${columnWidths.rating}px`
+                          maxWidth: `${columnWidths.rating}px`,
+                          left: column.sticky ? `${columnWidths.name}px` : 'auto'
                         }}
                       >
                         {business.rating && business.reviewCount ? formatRating(business.rating, business.reviewCount) : '-'}
@@ -360,7 +364,8 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                         style={{ 
                           width: `${columnWidths.contact}px`,
                           minWidth: `${columnWidths.contact}px`,
-                          maxWidth: `${columnWidths.contact}px`
+                          maxWidth: `${columnWidths.contact}px`,
+                          left: column.sticky ? `${columnWidths.name}px` : 'auto'
                         }}
                       >
                         <div className="flex items-center gap-2">
@@ -414,7 +419,8 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                         style={{ 
                           width: `${columnWidths.status}px`,
                           minWidth: `${columnWidths.status}px`,
-                          maxWidth: `${columnWidths.status}px`
+                          maxWidth: `${columnWidths.status}px`,
+                          left: column.sticky ? `${columnWidths.name}px` : 'auto'
                         }}
                       >
                         {getStatusBadge(business.status)}
