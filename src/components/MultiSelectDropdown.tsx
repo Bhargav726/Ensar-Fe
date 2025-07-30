@@ -70,9 +70,9 @@ export function MultiSelectDropdown({
   }
 
   return (
-    <div className="relative" ref={dropdownRef}>
         {selectedValues.length > 0 && (
           <>
+            <div className="relative" ref={dropdownRef}>
             <label className="block text-sm font-medium mb-2 flex items-center gap-2">
             {label}
             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
