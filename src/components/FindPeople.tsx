@@ -206,15 +206,6 @@ export function FindPeople() {
                 <h2 className="font-semibold mb-4">Filters</h2>
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-medium text-sm mb-2">Search</h3>
-                    <Input 
-                      placeholder="Search businesses..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
-
-                  <div>
                     <MultiSelectDropdown
                       label="Location"
                       options={countryOptions}
