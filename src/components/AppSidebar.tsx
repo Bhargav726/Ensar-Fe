@@ -101,6 +101,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {businessItems.map(item => <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild isActive={item.active || isActive(item.url)} className={item.active ? "bg-accent text-accent-foreground font-medium" : ""}>
                     <NavLink to={item.url} className="flex items-center gap-2">
                       <item.icon className="w-4 h-4" />
                       {!collapsed && <span>{item.title}</span>}
