@@ -2,11 +2,13 @@ import { Home, Users, Building2, DollarSign, List, BarChart3, Search, Phone, Set
 import { NavLink, useLocation } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+
 const mainItems = [{
   title: "Home",
   url: "/",
   icon: Home
 }];
+
 const prospectItems = [{
   title: "Find people",
   url: "/find-people",
@@ -51,6 +53,7 @@ export function AppSidebar() {
   const location = useLocation();
   const collapsed = state === "collapsed";
   const isActive = (path: string) => location.pathname === path;
+  
   return <Sidebar className={collapsed ? "w-14" : "w-60"} collapsible="icon">
       <SidebarHeader className="p-4">
         {!collapsed && <div className="flex items-center gap-2">
@@ -62,8 +65,6 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-2">
-        
-
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -95,13 +96,12 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-
         <SidebarGroup>
           <SidebarGroupLabel>Business Data</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {businessItems.map(item => <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild isActive={item.active || isActive(item.url)} className={item.active ? "bg-accent text-accent-foreground font-medium" : ""}>
+                <SidebarMenuButton asChild isActive={isActive(item.url)}>
                     <NavLink to={item.url} className="flex items-center gap-2">
                       <item.icon className="w-4 h-4" />
                       {!collapsed && <span>{item.title}</span>}
