@@ -453,7 +453,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                       return (
                         <div 
                           key={column.key}
-                          className="text-sm text-muted-foreground border-r px-4 py-3"
+                          className="text-sm text-muted-foreground border-r px-4 py-2"
                           style={cellStyle}
                         >
                           <div 
