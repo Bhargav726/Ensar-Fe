@@ -105,7 +105,6 @@ export function AppSidebar() {
                       <item.icon className="w-4 h-4" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
-                  </SidebarMenuButton>
                 </SidebarMenuItem>)}
             </SidebarMenu>
           </SidebarGroupContent>
