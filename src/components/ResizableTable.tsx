@@ -260,7 +260,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
 
   return (
     <TooltipProvider>
-      <div ref={tableRef} className="relative h-full flex flex-col">
+      <div ref={tableRef} className="relative h-full flex flex-col overflow-hidden">
         {dragLine.show && (
           <div 
             className="absolute top-0 bottom-0 w-0.5 bg-blue-500 z-50 pointer-events-none"
@@ -269,7 +269,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
         )}
 
         {/* Fixed Header */}
-        <div className="sticky top-0 z-40 bg-background border-b flex">
+        <div className="sticky top-0 z-40 bg-background border-b flex shrink-0">
           {/* Sticky Headers */}
           <div className="flex">
             {stickyColumns.map((column, index) => {
@@ -277,7 +277,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                 return (
                   <div 
                     key={column.key}
-                    className="flex items-center justify-center border-r bg-background"
+                    className="flex items-center justify-center border-r bg-background px-4 py-3"
                     style={{ 
                       width: `${columnWidths[column.key]}px`,
                       minWidth: `${columnWidths[column.key]}px`,
@@ -381,7 +381,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
         </div>
 
         {/* Scrollable Body */}
-        <div className="flex-1 flex">
+        <div className="flex-1 flex overflow-hidden">
           {/* Sticky Columns */}
           <div className="flex flex-col">
             {sortedBusinesses.map((business) => (
@@ -395,6 +395,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                         style={{
                           width: `${columnWidths[column.key]}px`,
                           minWidth: `${columnWidths[column.key]}px`,
+                          height: '56px'
                         }}
                       >
                         <Checkbox
@@ -409,10 +410,11 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                     return (
                       <div 
                         key={column.key}
-                        className="border-r bg-background px-4 py-3 cursor-pointer"
+                        className="flex items-center border-r bg-background px-4 py-3 cursor-pointer"
                         style={{
                           width: `${columnWidths[column.key]}px`,
                           minWidth: `${columnWidths[column.key]}px`,
+                          height: '56px'
                         }}
                         onClick={() => onBusinessClick(business)}
                       >
@@ -447,13 +449,14 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                     const cellStyle = {
                       width: `${columnWidths[column.key]}px`,
                       minWidth: `${columnWidths[column.key]}px`,
+                      height: '56px'
                     }
 
                     if (column.key === 'address') {
                       return (
                         <div 
                           key={column.key}
-                          className="text-sm text-muted-foreground border-r px-4 py-2"
+                          className="flex items-center text-sm text-muted-foreground border-r px-4 py-3"
                           style={cellStyle}
                         >
                           <div 
@@ -471,7 +474,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                       return (
                         <div 
                           key={column.key}
-                          className="text-sm text-muted-foreground border-r px-4 py-3"
+                          className="flex items-center text-sm text-muted-foreground border-r px-4 py-3"
                           style={cellStyle}
                         >
                           <div 
@@ -491,7 +494,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                       return (
                         <div
                           key={column.key}
-                          className="border-r px-4 py-3"
+                          className="flex items-center border-r px-4 py-3"
                           style={cellStyle}
                         >
                           {business.rating && business.reviewCount ? formatRating(business.rating, business.reviewCount) : '-'}
@@ -503,7 +506,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                       return (
                         <div
                           key={column.key}
-                          className="border-r px-4 py-3"
+                          className="flex items-center border-r px-4 py-3"
                           style={cellStyle}
                         >
                           <div className="flex items-center gap-2">
@@ -553,7 +556,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                       return (
                         <div
                           key={column.key}
-                          className="border-r px-4 py-3"
+                          className="flex items-center border-r px-4 py-3"
                           style={cellStyle}
                         >
                           {getStatusBadge(business.status)}
