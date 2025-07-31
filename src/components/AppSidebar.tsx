@@ -1,4 +1,4 @@
-import { Home, Users, Building2, DollarSign, List, BarChart3, Search, Phone, Settings, ChevronDown, Star,Location, Website, Message } from "lucide-react";
+import { Home, Users, Building2, DollarSign, List, BarChart3, Search, Phone, Settings, ChevronDown, Star, MapPin, Globe, MessageSquare } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -25,15 +25,15 @@ const businessItems = [{
 }, {
   title: "Types by location",
   url: "/types-by-location",
-  icon: location
+  icon:  MapPin
 },{
   title: "Websites",
   url: "/websites",
-  icon: Website
+  icon: Globe
 },{
   title: "Sales plans",
   url: "/sales-plans",
-  icon: Message
+  icon: MessageSquare
 },{
   title: "Leads",
   url: "/leads",
@@ -41,7 +41,7 @@ const businessItems = [{
 },{
   title: "Leads plans",
   url: "/leads-plans",
-  icon: Message
+  icon: MessageSquare
 }];
 
 export function AppSidebar() {
