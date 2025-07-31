@@ -17,6 +17,19 @@ const prospectItems = [{
   url: "/find-companies",
   icon: Building2
 }];
+const recordItems = [{
+  title: "People",
+  url: "/people",
+  icon: Users
+}, {
+  title: "Companies",
+  url: "/companies",
+  icon: Building2
+}, {
+  title: "Deals",
+  url: "/deals",
+  icon: DollarSign
+}];
 export function AppSidebar() {
   const {
     state
@@ -69,20 +82,34 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
+          
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {recordItems.map(item => <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                    
+                  </SidebarMenuButton>
+                </SidebarMenuItem>)}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink to="/settings" className="flex items-center gap-2">
-                    <Settings className="w-4 h-4" />
-                    {!collapsed && <span>Admin Settings</span>}
-                    {!collapsed && <ChevronDown className="w-4 h-4 ml-auto" />}
-                  </NavLink>
+                <SidebarMenuButton asChild isActive={isActive("/lists")}>
+                  
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <div className="mt-auto p-2">
+          {!collapsed}
+        </div>
+
       </SidebarContent>
     </Sidebar>;
 }
