@@ -64,6 +64,7 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
   const tableRef = useRef<HTMLDivElement>(null)
   const headerScrollRef = useRef<HTMLDivElement>(null)
   const bodyScrollRef = useRef<HTMLDivElement>(null)
+  const stickyBodyRef = useRef<HTMLDivElement>(null)
   const startXRef = useRef<number>(0)
   const startWidthRef = useRef<number>(0)
 
@@ -77,6 +78,16 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
   const handleBodyScroll = (e: React.UIEvent<HTMLDivElement>) => {
     if (headerScrollRef.current) {
       headerScrollRef.current.scrollLeft = e.currentTarget.scrollLeft
+    }
+    // Sync vertical scroll for sticky columns
+    if (stickyBodyRef.current) {
+      stickyBodyRef.current.scrollTop = e.currentTarget.scrollTop
+    }
+  }
+
+  const handleStickyBodyScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (bodyScrollRef.current) {
+      bodyScrollRef.current.scrollTop = e.currentTarget.scrollTop
     }
   }
 
@@ -236,16 +247,6 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
     )
   }
 
-  const getStickyLeft = (index: number) => {
-    let left = 0;
-    for (let i = 0; i < index; i++) {
-      if (sortedColumns[i].sticky) {
-        left += columnWidths[sortedColumns[i].key];
-      }
-    }
-    return left;
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -383,56 +384,63 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
         {/* Scrollable Body */}
         <div className="flex-1 flex overflow-hidden">
           {/* Sticky Columns */}
-          <div className="flex flex-col">
-            {sortedBusinesses.map((business) => (
-              <div key={business.id} className="flex hover:bg-muted/50 border-b">
-                {stickyColumns.map((column) => {
-                  if (column.key === 'checkbox') {
-                    return (
-                      <div 
-                        key={column.key}
-                        className="flex items-center justify-center border-r bg-background px-4 py-3"
-                        style={{
-                          width: `${columnWidths[column.key]}px`,
-                          minWidth: `${columnWidths[column.key]}px`,
-                          height: '56px'
-                        }}
-                      >
-                        <Checkbox
-                          checked={selectedRows.has(business.id)}
-                          onCheckedChange={(checked) => handleRowSelect(business.id, checked as boolean)}
-                        />
-                      </div>
-                    )
-                  }
-
-                  if (column.key === 'name') {
-                    return (
-                      <div 
-                        key={column.key}
-                        className="flex items-center border-r bg-background px-4 py-3 cursor-pointer"
-                        style={{
-                          width: `${columnWidths[column.key]}px`,
-                          minWidth: `${columnWidths[column.key]}px`,
-                          height: '56px'
-                        }}
-                        onClick={() => onBusinessClick(business)}
-                      >
+          <div 
+            ref={stickyBodyRef}
+            className="overflow-y-auto"
+            onScroll={handleStickyBodyScroll}
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <div>
+              {sortedBusinesses.map((business) => (
+                <div key={business.id} className="flex hover:bg-muted/50 border-b">
+                  {stickyColumns.map((column) => {
+                    if (column.key === 'checkbox') {
+                      return (
                         <div 
-                          className="underline truncate"
-                          style={{ width: `${columnWidths.name - 24}px` }}
-                          title={business.name}
+                          key={column.key}
+                          className="flex items-center justify-center border-r bg-background px-4 py-3"
+                          style={{
+                            width: `${columnWidths[column.key]}px`,
+                            minWidth: `${columnWidths[column.key]}px`,
+                            height: '56px'
+                          }}
                         >
-                          {business.name}
+                          <Checkbox
+                            checked={selectedRows.has(business.id)}
+                            onCheckedChange={(checked) => handleRowSelect(business.id, checked as boolean)}
+                          />
                         </div>
-                      </div>
-                    )
-                  }
+                      )
+                    }
 
-                  return null
-                })}
-              </div>
-            ))}
+                    if (column.key === 'name') {
+                      return (
+                        <div 
+                          key={column.key}
+                          className="flex items-center border-r bg-background px-4 py-3 cursor-pointer"
+                          style={{
+                            width: `${columnWidths[column.key]}px`,
+                            minWidth: `${columnWidths[column.key]}px`,
+                            height: '56px'
+                          }}
+                          onClick={() => onBusinessClick(business)}
+                        >
+                          <div 
+                            className="underline truncate"
+                            style={{ width: `${columnWidths.name - 24}px` }}
+                            title={business.name}
+                          >
+                            {business.name}
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    return null
+                  })}
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Scrollable Columns */}
@@ -440,7 +448,6 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
             ref={bodyScrollRef}
             className="flex-1 overflow-auto"
             onScroll={handleBodyScroll}
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             <div>
               {sortedBusinesses.map((business) => (
