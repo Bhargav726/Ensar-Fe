@@ -1,4 +1,4 @@
-import { Home, Users, Building2, DollarSign, List, BarChart3, Search, Phone, Settings, ChevronDown, Star } from "lucide-react";
+import { Home, Users, Building2, DollarSign, List, BarChart3, Search, Phone, Settings, ChevronDown, Star,Location, Website, Message } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,32 @@ const prospectItems = [{
   title: "Find companies",
   url: "/find-companies",
   icon: Building2
+}];
+
+const businessItems = [{
+  title: "Business types",
+  url: "/business-types",
+  icon: Building2,
+}, {
+  title: "Types by location",
+  url: "/types-by-location",
+  icon: location
+},{
+  title: "Websites",
+  url: "/websites",
+  icon: Website
+},{
+  title: "Sales plans",
+  url: "/sales-plans",
+  icon: Message
+},{
+  title: "Leads",
+  url: "/leads",
+  icon: Building2
+},{
+  title: "Leads plans",
+  url: "/leads-plans",
+  icon: Message
 }];
 
 export function AppSidebar() {
@@ -58,6 +84,23 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {prospectItems.map(item => <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild isActive={item.active || isActive(item.url)} className={item.active ? "bg-accent text-accent-foreground font-medium" : ""}>
+                    <NavLink to={item.url} className="flex items-center gap-2">
+                      <item.icon className="w-4 h-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>)}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Business Data</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {businessItems.map(item => <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={item.active || isActive(item.url)} className={item.active ? "bg-accent text-accent-foreground font-medium" : ""}>
                     <NavLink to={item.url} className="flex items-center gap-2">
                       <item.icon className="w-4 h-4" />
