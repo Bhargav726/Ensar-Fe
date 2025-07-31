@@ -62,8 +62,23 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
   const [selectAll, setSelectAll] = useState(false)
   
   const tableRef = useRef<HTMLDivElement>(null)
+  const headerScrollRef = useRef<HTMLDivElement>(null)
+  const bodyScrollRef = useRef<HTMLDivElement>(null)
   const startXRef = useRef<number>(0)
   const startWidthRef = useRef<number>(0)
+
+  // Sync scroll between header and body
+  const handleHeaderScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (bodyScrollRef.current) {
+      bodyScrollRef.current.scrollLeft = e.currentTarget.scrollLeft
+    }
+  }
+
+  const handleBodyScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (headerScrollRef.current) {
+      headerScrollRef.current.scrollLeft = e.currentTarget.scrollLeft
+    }
+  }
 
   // Update sorted businesses when businesses or sort config changes
   useEffect(() => {
@@ -240,153 +255,205 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
   }
 
   const sortedColumns = [...columns].sort((a, b) => a.order - b.order)
+  const stickyColumns = sortedColumns.filter(col => col.sticky)
+  const scrollableColumns = sortedColumns.filter(col => !col.sticky)
 
   return (
     <TooltipProvider>
-      <div className="relative h-full flex flex-col">
-        {/* Fixed Header */}
-        <div className="sticky top-0 z-40 bg-background border-b">
-          {dragLine.show && (
-            <div 
-              className="absolute top-0 bottom-0 w-0.5 bg-blue-500 z-30 pointer-events-none"
-              style={{ left: `${dragLine.x}px` }}
-            />
-          )}
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {sortedColumns.map((column, index) => {
-                  if (column.key === 'checkbox') {
-                    return (
-                      <TableHead 
-                        key={column.key}
-                        className="sticky bg-background z-50 border-r"
-                        style={{ 
-                          width: `${columnWidths[column.key]}px`,
-                          minWidth: `${columnWidths[column.key]}px`,
-                          maxWidth: `${columnWidths[column.key]}px`,
-                          left: `0px`,
-                        }}
-                      >
-                        <Checkbox
-                          checked={selectAll}
-                          onCheckedChange={handleSelectAll}
-                        />
-                      </TableHead>
-                    )
-                  }
+      <div ref={tableRef} className="relative h-full flex flex-col">
+        {dragLine.show && (
+          <div 
+            className="absolute top-0 bottom-0 w-0.5 bg-blue-500 z-50 pointer-events-none"
+            style={{ left: `${dragLine.x}px` }}
+          />
+        )}
 
-                  return (
-                    <ColumnContextMenu
-                      key={column.key}
-                      columnKey={column.key}
-                      columnLabel={column.label}
-                      onSort={handleSort}
-                      onMove={handleMove}
-                      onFreeze={handleFreeze}
-                      canMoveLeft={index > 1}
-                      canMoveRight={index < sortedColumns.length - 1}
-                      isFrozen={!!column.sticky}
-                    >
-                      <TableHead 
-                        className={`relative cursor-pointer select-none ${
-                          column.sticky ? 'sticky bg-background z-40 border-r' : ''
-                        }`}
-                        style={{ 
-                          width: `${columnWidths[column.key]}px`,
-                          minWidth: `${columnWidths[column.key]}px`,
-                          maxWidth: `${columnWidths[column.key]}px`,
-                          ...(column.sticky && {
-                            left: `${getStickyLeft(index)}px`,
-                          })
-                        }}
+        {/* Fixed Header */}
+        <div className="sticky top-0 z-40 bg-background border-b flex">
+          {/* Sticky Headers */}
+          <div className="flex">
+            {stickyColumns.map((column, index) => {
+              if (column.key === 'checkbox') {
+                return (
+                  <div 
+                    key={column.key}
+                    className="flex items-center justify-center border-r bg-background"
+                    style={{ 
+                      width: `${columnWidths[column.key]}px`,
+                      minWidth: `${columnWidths[column.key]}px`,
+                    }}
+                  >
+                    <Checkbox
+                      checked={selectAll}
+                      onCheckedChange={handleSelectAll}
+                    />
+                  </div>
+                )
+              }
+
+              return (
+                <ColumnContextMenu
+                  key={column.key}
+                  columnKey={column.key}
+                  columnLabel={column.label}
+                  onSort={handleSort}
+                  onMove={handleMove}
+                  onFreeze={handleFreeze}
+                  canMoveLeft={index > 1}
+                  canMoveRight={index < sortedColumns.length - 1}
+                  isFrozen={!!column.sticky}
+                >
+                  <div 
+                    className="relative cursor-pointer select-none border-r bg-background px-4 py-3 text-left font-medium"
+                    style={{ 
+                      width: `${columnWidths[column.key]}px`,
+                      minWidth: `${columnWidths[column.key]}px`,
+                    }}
+                  >
+                    <div className="flex items-center gap-1 pr-4">
+                      {column.label}
+                      {sortConfig?.key === column.key && (
+                        <span className="text-xs">
+                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
+                    {column.key !== 'checkbox' && (
+                      <div
+                        className="absolute top-0 right-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500/20 group"
+                        onMouseDown={(e) => handleMouseDown(e, column.key)}
                       >
-                        <div className="flex items-center gap-1 pr-4">
-                          {column.label}
-                          {sortConfig?.key === column.key && (
-                            <span className="text-xs">
-                              {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                            </span>
-                          )}
-                        </div>
-                        {column.key !== 'checkbox' && (
-                          <div
-                            className="absolute top-0 right-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500/20 group"
-                            onMouseDown={(e) => handleMouseDown(e, column.key)}
-                          >
-                            <div className="absolute top-1/2 right-0 w-0.5 h-4 bg-border group-hover:bg-blue-500 transform -translate-y-1/2" />
-                          </div>
-                        )}
-                      </TableHead>
-                    </ColumnContextMenu>
-                  )
-                })}
-              </TableRow>
-            </TableHeader>
-          </Table>
+                        <div className="absolute top-1/2 right-0 w-0.5 h-4 bg-border group-hover:bg-blue-500 transform -translate-y-1/2" />
+                      </div>
+                    )}
+                  </div>
+                </ColumnContextMenu>
+              )
+            })}
+          </div>
+
+          {/* Scrollable Headers */}
+          <div 
+            ref={headerScrollRef}
+            className="flex-1 overflow-x-auto overflow-y-hidden"
+            onScroll={handleHeaderScroll}
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <div className="flex">
+              {scrollableColumns.map((column, index) => (
+                <ColumnContextMenu
+                  key={column.key}
+                  columnKey={column.key}
+                  columnLabel={column.label}
+                  onSort={handleSort}
+                  onMove={handleMove}
+                  onFreeze={handleFreeze}
+                  canMoveLeft={index > 0}
+                  canMoveRight={index < scrollableColumns.length - 1}
+                  isFrozen={!!column.sticky}
+                >
+                  <div 
+                    className="relative cursor-pointer select-none border-r bg-background px-4 py-3 text-left font-medium"
+                    style={{ 
+                      width: `${columnWidths[column.key]}px`,
+                      minWidth: `${columnWidths[column.key]}px`,
+                    }}
+                  >
+                    <div className="flex items-center gap-1 pr-4">
+                      {column.label}
+                      {sortConfig?.key === column.key && (
+                        <span className="text-xs">
+                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      className="absolute top-0 right-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500/20 group"
+                      onMouseDown={(e) => handleMouseDown(e, column.key)}
+                    >
+                      <div className="absolute top-1/2 right-0 w-0.5 h-4 bg-border group-hover:bg-blue-500 transform -translate-y-1/2" />
+                    </div>
+                  </div>
+                </ColumnContextMenu>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Scrollable Body */}
-        <div 
-          className="flex-1 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-        >
-          <Table>
-            <TableBody>
+        <div className="flex-1 flex">
+          {/* Sticky Columns */}
+          <div className="flex flex-col">
+            {sortedBusinesses.map((business) => (
+              <div key={business.id} className="flex hover:bg-muted/50 border-b">
+                {stickyColumns.map((column) => {
+                  if (column.key === 'checkbox') {
+                    return (
+                      <div 
+                        key={column.key}
+                        className="flex items-center justify-center border-r bg-background px-4 py-3"
+                        style={{
+                          width: `${columnWidths[column.key]}px`,
+                          minWidth: `${columnWidths[column.key]}px`,
+                        }}
+                      >
+                        <Checkbox
+                          checked={selectedRows.has(business.id)}
+                          onCheckedChange={(checked) => handleRowSelect(business.id, checked as boolean)}
+                        />
+                      </div>
+                    )
+                  }
+
+                  if (column.key === 'name') {
+                    return (
+                      <div 
+                        key={column.key}
+                        className="border-r bg-background px-4 py-3 cursor-pointer"
+                        style={{
+                          width: `${columnWidths[column.key]}px`,
+                          minWidth: `${columnWidths[column.key]}px`,
+                        }}
+                        onClick={() => onBusinessClick(business)}
+                      >
+                        <div 
+                          className="underline truncate"
+                          style={{ width: `${columnWidths.name - 24}px` }}
+                          title={business.name}
+                        >
+                          {business.name}
+                        </div>
+                      </div>
+                    )
+                  }
+
+                  return null
+                })}
+              </div>
+            ))}
+          </div>
+
+          {/* Scrollable Columns */}
+          <div 
+            ref={bodyScrollRef}
+            className="flex-1 overflow-auto"
+            onScroll={handleBodyScroll}
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <div>
               {sortedBusinesses.map((business) => (
-                <TableRow 
-                  key={business.id}
-                  className="hover:bg-muted/50"
-                >
-                  {sortedColumns.map((column, index) => {
+                <div key={business.id} className="flex hover:bg-muted/50 border-b">
+                  {scrollableColumns.map((column) => {
                     const cellStyle = {
                       width: `${columnWidths[column.key]}px`,
                       minWidth: `${columnWidths[column.key]}px`,
-                      maxWidth: `${columnWidths[column.key]}px`,
-                      ...(column.sticky && {
-                        left: `${getStickyLeft(index)}px`,
-                        zIndex: 20,
-                      })
-                    };
-
-                    if (column.key === 'checkbox') {
-                      return (
-                        <TableCell 
-                          key={column.key}
-                          className="sticky bg-background border-r z-30"
-                          style={cellStyle}
-                        >
-                          <Checkbox
-                            checked={selectedRows.has(business.id)}
-                            onCheckedChange={(checked) => handleRowSelect(business.id, checked as boolean)}
-                          />
-                        </TableCell>
-                      )
-                    }
-
-                    if (column.key === 'name') {
-                      return (
-                        <TableCell 
-                          key={column.key}
-                          className="sticky bg-background border-r z-20 cursor-pointer"
-                          style={cellStyle}
-                          onClick={() => onBusinessClick(business)}
-                        >
-                          <div 
-                            className="underline truncate"
-                            style={{ width: `${columnWidths.name - 24}px` }}
-                            title={business.name}
-                          >
-                            {business.name}
-                          </div>
-                        </TableCell>
-                      )
                     }
 
                     if (column.key === 'address') {
                       return (
-                        <TableCell 
+                        <div 
                           key={column.key}
-                          className={`text-sm text-muted-foreground ${column.sticky ? 'sticky bg-background border-r' : ''}`}
+                          className="text-sm text-muted-foreground border-r px-4 py-3"
                           style={cellStyle}
                         >
                           <div 
@@ -396,47 +463,47 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                           >
                             {business.address}
                           </div>
-                        </TableCell>
+                        </div>
                       )
                     }
 
                     if (column.key === 'type') {
-  return (
-    <TableCell 
-      key={column.key}
-      className={`text-sm text-muted-foreground ${column.sticky ? 'sticky bg-background border-r' : ''}`}
-      style={cellStyle}
-    >
-      <div 
-        className="truncate"
-        style={{ width: `${columnWidths.type - 24}px` }}
-        title={business.type}
-      >
-        <Badge variant="secondary" className="bg-gray-100 text-gray-800 border-gray-300">
-          {business.type}
-        </Badge>
-      </div>
-    </TableCell>
-  )
-}
+                      return (
+                        <div 
+                          key={column.key}
+                          className="text-sm text-muted-foreground border-r px-4 py-3"
+                          style={cellStyle}
+                        >
+                          <div 
+                            className="truncate"
+                            style={{ width: `${columnWidths.type - 24}px` }}
+                            title={business.type}
+                          >
+                            <Badge variant="secondary" className="bg-gray-100 text-gray-800 border-gray-300">
+                              {business.type}
+                            </Badge>
+                          </div>
+                        </div>
+                      )
+                    }
 
                     if (column.key === 'rating') {
                       return (
-                        <TableCell
+                        <div
                           key={column.key}
-                          className={column.sticky ? 'sticky bg-background border-r' : ''}
+                          className="border-r px-4 py-3"
                           style={cellStyle}
                         >
                           {business.rating && business.reviewCount ? formatRating(business.rating, business.reviewCount) : '-'}
-                        </TableCell>
+                        </div>
                       )
                     }
 
                     if (column.key === 'contact') {
                       return (
-                        <TableCell
+                        <div
                           key={column.key}
-                          className={column.sticky ? 'sticky bg-background border-r' : ''}
+                          className="border-r px-4 py-3"
                           style={cellStyle}
                         >
                           <div className="flex items-center gap-2">
@@ -478,29 +545,39 @@ export function ResizableTable({ businesses, onBusinessClick, loading }: Resizab
                               </TooltipContent>
                             </Tooltip>
                           </div>
-                        </TableCell>
+                        </div>
                       )
                     }
 
                     if (column.key === 'status') {
                       return (
-                        <TableCell
+                        <div
                           key={column.key}
-                          className={column.sticky ? 'sticky bg-background border-r' : ''}
+                          className="border-r px-4 py-3"
                           style={cellStyle}
                         >
                           {getStatusBadge(business.status)}
-                        </TableCell>
+                        </div>
                       )
                     }
 
-                    return null;
+                    return null
                   })}
-                </TableRow>
+                </div>
               ))}
-            </TableBody>
-          </Table>
+            </div>
+          </div>
         </div>
+
+        {/* Hide scrollbars */}
+        <style>{`
+          div[style*="scrollbar-width: none"] {
+            scrollbar-width: none;
+          }
+          div[style*="scrollbar-width: none"]::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
       </div>
     </TooltipProvider>
   )
