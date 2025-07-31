@@ -8,12 +8,11 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   return (
-   <SidebarProvider>
-  <div className="flex h-screen w-full overflow-hidden bg-background">
+    <SidebarProvider>
+  <div className="flex min-h-screen w-full overflow-hidden bg-background">
     <AppSidebar />
-
-    <main className="flex flex-1 flex-col overflow-hidden">
-      {/* Header (fixed) */}
+    
+    <main className="sticky flex flex-1 flex-col overflow-hidden">
       <header className="h-12 flex items-center border-b border-border bg-background px-4 shrink-0">
         <SidebarTrigger className="mr-2" />
         <div className="flex items-center gap-2">
@@ -21,11 +20,8 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      {/* Content (scrollable area) */}
-      <div className="flex flex-1 overflow-hidden">
-        <div className="w-full overflow-y-auto">
-          {children}
-        </div>
+      <div className="flex-1 overflow-auto">
+        {children}
       </div>
     </main>
   </div>
