@@ -17,19 +17,7 @@ const prospectItems = [{
   url: "/find-companies",
   icon: Building2
 }];
-const recordItems = [{
-  title: "People",
-  url: "/people",
-  icon: Users
-}, {
-  title: "Companies",
-  url: "/companies",
-  icon: Building2
-}, {
-  title: "Deals",
-  url: "/deals",
-  icon: DollarSign
-}];
+
 export function AppSidebar() {
   const {
     state
@@ -77,31 +65,6 @@ export function AppSidebar() {
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>)}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {recordItems.map(item => <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    
-                  </SidebarMenuButton>
-                </SidebarMenuItem>)}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={isActive("/lists")}>
-                  
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
