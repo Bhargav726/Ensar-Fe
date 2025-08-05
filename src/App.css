@@ -1,8 +1,7 @@
+/* Remove conflicting styles that might interfere with table layout */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .logo {

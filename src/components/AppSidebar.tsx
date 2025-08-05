@@ -1,7 +1,9 @@
-import { Home, Users, Building2, DollarSign, List, BarChart3, Search, Phone, Settings, ChevronDown, Star, MapPin, Globe, MessageSquare } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
+import { Building2, Globe, Home, MapPin, MessageSquare, Star, Users } from "lucide-react";
+import React from "react";
+import { NavLink, useLocation } from "react-router-dom";
 
 const mainItems = [{
   title: "Home",
@@ -12,12 +14,7 @@ const mainItems = [{
 const prospectItems = [{
   title: "Find people",
   url: "/find-people",
-  icon: Users,
-  active: true
-}, {
-  title: "Find companies",
-  url: "/find-companies",
-  icon: Building2
+  icon: Users
 }];
 
 const businessItems = [{
@@ -53,25 +50,60 @@ export function AppSidebar() {
   const location = useLocation();
   const collapsed = state === "collapsed";
   const isActive = (path: string) => location.pathname === path;
+
+  const CustomSidebarTrigger = React.forwardRef<
+  React.ElementRef<typeof Button>,
+  React.ComponentProps<typeof Button>
+>(({ className, onClick, ...props }, ref) => {
+  const { toggleSidebar, state } = useSidebar();
+  const isCollapsed = state === "collapsed";
+
+  return (
+    <Button
+      ref={ref}
+      data-sidebar="trigger"
+      variant="ghost"
+      size="icon"
+      className={cn("h-7 w-7", className)}
+      onClick={(event) => {
+        onClick?.(event)
+        toggleSidebar()
+      }}
+      {...props}
+    >
+      <span className="text-sm font-mono">
+        {isCollapsed ? "<<" : ">>"}
+      </span>
+      <span className="sr-only">Toggle Sidebar</span>
+    </Button>
+  )
+})
+CustomSidebarTrigger.displayName = "CustomSidebarTrigger"
+
   
-  return <Sidebar className={collapsed ? "w-14" : "w-60"} collapsible="icon">
+  return <Sidebar className={collapsed ? "w-24" : "w-60"} collapsible="icon">
       <SidebarHeader className="p-4">
-        {!collapsed && <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
+        <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between'}`}>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary rounded flex items-center justify-center flex-shrink-0">
               <Star className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-lg">Ensar Sales</span>
-          </div>}
+            {!collapsed && <span className="font-semibold text-lg">Ensar Sales</span>}
+          </div>
+           {!collapsed && <CustomSidebarTrigger className="mr-2" />}
+        </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-2">
+      <SidebarContent className={`${collapsed ? 'px-0' : 'px-2'}`}>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainItems.map(item => <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <NavLink to={item.url} className="flex items-center gap-2">
-                      <item.icon className="w-4 h-4" />
+                    <NavLink to={item.url} className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2'}`}>
+                      <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
+                        <item.icon className="w-4 h-4" />
+                      </div>
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
@@ -81,13 +113,15 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Prospect & manage records</SidebarGroupLabel>
+          {!collapsed && <SidebarGroupLabel>Prospect & manage records</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               {prospectItems.map(item => <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={item.active || isActive(item.url)} className={item.active ? "bg-accent text-accent-foreground font-medium" : ""}>
-                    <NavLink to={item.url} className="flex items-center gap-2">
-                      <item.icon className="w-4 h-4" />
+                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                    <NavLink to={item.url} className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2'}`}>
+                      <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
+                        <item.icon className="w-4 h-4" />
+                      </div>
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
@@ -97,13 +131,15 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Business Data</SidebarGroupLabel>
+          {!collapsed && <SidebarGroupLabel>Business Data</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               {businessItems.map(item => <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <NavLink to={item.url} className="flex items-center gap-2">
-                      <item.icon className="w-4 h-4" />
+                    <NavLink to={item.url} className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2'}`}>
+                      <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
+                        <item.icon className="w-4 h-4" />
+                      </div>
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>

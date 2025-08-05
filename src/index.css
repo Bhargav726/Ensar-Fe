@@ -103,3 +103,55 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom scrollbar styles */
+@layer utilities {
+  /* Hide scrollbars for specific elements */
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Custom scrollbar for overflow-auto elements */
+  .overflow-auto::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .overflow-auto::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .overflow-auto::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+  
+  .overflow-auto::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+  
+  /* Ensure table borders are consistent */
+  .table-border-fix {
+    border-collapse: collapse;
+  }
+  
+  .table-border-fix td,
+  .table-border-fix th {
+    border: 1px solid hsl(var(--border));
+  }
+}
+
+/* Global overflow handling */
+html, body {
+  overflow: hidden;
+}
+
+#root {
+  height: 100vh;
+  overflow: hidden;
+}
